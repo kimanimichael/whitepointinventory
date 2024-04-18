@@ -14,6 +14,10 @@ import (
 	_ "github.com/lib/pq"
 )
 
+type apiConfig struct {
+	DB *database.Queries
+}
+
 func main()  {
 	fmt.Println("Welcome to whitepoint invetory")
 
@@ -23,6 +27,23 @@ func main()  {
 
 	if portstring == "" {
 		log.Fatal("couldn't find a port in this environment")
+	}
+
+	dbURL := os.Getenv("DB_URL")
+	if dbURL == "" {
+		log.Fatal("DB_URL not found in this environment")
+	}
+
+	conn, err := sql.Open("postgres", dbURL)	
+	if err != nil {
+		fmt.Println("Error: ", err)
+		log.Fatal("Cannot connect to database")
+	}
+
+	db := database.New(conn)
+
+	apiCfg := apiConfig {
+		DB: db,
 	}
 
 	router := chi.NewRouter()
