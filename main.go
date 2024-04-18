@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -8,6 +9,9 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/joho/godotenv"
+	"github.com/mike-kimani/whitepointinventory/internal/database"
+	
+	_ "github.com/lib/pq"
 )
 
 func main()  {
