@@ -5,11 +5,20 @@
 package database
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
 )
 
+type Farmer struct {
+	ID             uuid.UUID
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	Name           string
+	ChickenBalance sql.NullInt32
+	CashBalance    sql.NullInt32
+}
 type User struct {
 	ID        uuid.UUID
 	CreatedAt time.Time
