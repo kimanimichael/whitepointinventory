@@ -6,3 +6,5 @@ RETURNING *;
 -- name: GetFarmerByName :one
 SELECT * FROM farmers where name = $1;
 
+-- name: DeleteFarmers :exec
+DELETE FROM farmers where id = $1;
