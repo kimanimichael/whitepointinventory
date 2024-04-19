@@ -5,3 +5,4 @@ RETURNING *;
 
 -- name: GetFarmerByName :one
 SELECT * FROM farmers where name = $1;
+
