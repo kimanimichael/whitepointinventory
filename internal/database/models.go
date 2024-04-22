@@ -19,6 +19,17 @@ type Farmer struct {
 	ChickenBalance sql.NullInt32
 	CashBalance    sql.NullInt32
 }
+
+type Purchase struct {
+	ID              uuid.UUID
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	Chicken         int32
+	PricePerChicken int32
+	UserID          uuid.UUID
+	FarmerID        uuid.UUID
+}
+
 type User struct {
 	ID        uuid.UUID
 	CreatedAt time.Time
