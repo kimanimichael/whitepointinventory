@@ -13,6 +13,8 @@ import (
 func (apiCfg *apiConfig)handlerCreateUser(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
 		Name string `json:"name"`
+		Password string `json:"password"`
+		Email string `json:"email_address"`
 	}
 
 	decoder := json.NewDecoder(r.Body)
