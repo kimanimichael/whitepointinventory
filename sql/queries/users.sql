@@ -8,5 +8,5 @@ RETURNING *;
 -- name: GetUserByAPIKey :one
 SELECT * FROM users WHERE api_key = $1;
 
--- name: GetUserByPasswordAndUserName :one
-SELECT * FROM users WHERE password = $1 AND name = $2;
+-- name: GetUserByPasswordAndEmail :one
+SELECT * FROM users WHERE password = $1 AND email = $2;
