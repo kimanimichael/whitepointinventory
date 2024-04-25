@@ -1,0 +1,8 @@
+-- +goose Up
+
+ALTER TABLE users
+ADD COLUMN PASSWORD TEXT NOT NULL DEFAULT ('password');
+
+-- +goose Down
+
+DROP COLUMN PASSWORD;
