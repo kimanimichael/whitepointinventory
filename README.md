@@ -1,0 +1,1 @@
+This repository holds the backend for the inventory of white point chicken suppliers supporting purchases on credit or cash from suppliers and payments to the same. This is to solve the problems whitepoint faces with managing inventory between them and their suppliers.
