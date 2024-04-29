@@ -49,6 +49,38 @@ func (q *Queries) CreateFarmer(ctx context.Context, arg CreateFarmerParams) (Far
 	return i, err
 }
 
+const decreaseCashOwed = `-- name: DecreaseCashOwed :exec
+UPDATE farmers
+SET cash_balance = COALESCE(cash_balance, 0) - ($1)
+WHERE farmers.id = $2
+`
+
+type DecreaseCashOwedParams struct {
+	CashBalance sql.NullInt32
+	ID          uuid.UUID
+}
+
+func (q *Queries) DecreaseCashOwed(ctx context.Context, arg DecreaseCashOwedParams) error {
+	_, err := q.db.ExecContext(ctx, decreaseCashOwed, arg.CashBalance, arg.ID)
+	return err
+}
+
+const decreaseChickenOwed = `-- name: DecreaseChickenOwed :exec
+UPDATE farmers
+SET chicken_balance = COALESCE(chicken_balance, 0) - $1
+WHERE farmers.id = $2
+`
+
+type DecreaseChickenOwedParams struct {
+	ChickenBalance sql.NullInt32
+	ID             uuid.UUID
+}
+
+func (q *Queries) DecreaseChickenOwed(ctx context.Context, arg DecreaseChickenOwedParams) error {
+	_, err := q.db.ExecContext(ctx, decreaseChickenOwed, arg.ChickenBalance, arg.ID)
+	return err
+}
+
 const deleteFarmers = `-- name: DeleteFarmers :exec
 DELETE FROM farmers where id = $1
 `
@@ -74,4 +106,36 @@ func (q *Queries) GetFarmerByName(ctx context.Context, name string) (Farmer, err
 		&i.CashBalance,
 	)
 	return i, err
+}
+
+const increaseCashOwed = `-- name: IncreaseCashOwed :exec
+UPDATE farmers
+SET cash_balance = COALESCE(cash_balance, 0) + ($1)
+WHERE farmers.id = $2
+`
+
+type IncreaseCashOwedParams struct {
+	CashBalance sql.NullInt32
+	ID          uuid.UUID
+}
+
+func (q *Queries) IncreaseCashOwed(ctx context.Context, arg IncreaseCashOwedParams) error {
+	_, err := q.db.ExecContext(ctx, increaseCashOwed, arg.CashBalance, arg.ID)
+	return err
+}
+
+const increaseChickenOwed = `-- name: IncreaseChickenOwed :exec
+UPDATE farmers
+SET chicken_balance = COALESCE(chicken_balance, 0) + $1
+WHERE farmers.id = $2
+`
+
+type IncreaseChickenOwedParams struct {
+	ChickenBalance sql.NullInt32
+	ID             uuid.UUID
+}
+
+func (q *Queries) IncreaseChickenOwed(ctx context.Context, arg IncreaseChickenOwedParams) error {
+	_, err := q.db.ExecContext(ctx, increaseChickenOwed, arg.ChickenBalance, arg.ID)
+	return err
 }
