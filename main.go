@@ -54,6 +54,8 @@ func main()  {
 	v1Router.Post("/farmers", apiCfg.handlerCreateFarmer)
 	v1Router.Get("/farmers", apiCfg.handlerGetFarmerByName)
 	v1Router.Delete("/farmers/{farmer_id}", apiCfg.handlerDeleteFarmer)
+	v1Router.Post("/purchases", apiCfg.middlewareAuth(apiCfg.handerCreatePurchases))
+	v1Router.Delete("/purchases/{purchase_id}", apiCfg.handlerDeletePurchase)
 
 	router.Mount("/v1", v1Router)
 
