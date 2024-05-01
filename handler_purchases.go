@@ -75,7 +75,7 @@ func (apiCfg *apiConfig)handerCreatePurchases(w http.ResponseWriter, r *http.Req
 	respondWithJSON(w, 201, purchase)
 }
 
-func (apiCfg *apiConfig) handlerDeletePurchase(w http.ResponseWriter, r *http.Request) {
+func (apiCfg *apiConfig) handlerDeletePurchase(w http.ResponseWriter, r *http.Request, user database.User) {
 	purchaseIDStr := chi.URLParam(r, "purchase_id")
 	purchaseID, err := uuid.Parse(purchaseIDStr)
 	if err != nil {
@@ -120,6 +120,6 @@ func (apiCfg *apiConfig) handlerDeletePurchase(w http.ResponseWriter, r *http.Re
 		respondWithError(w, 400, fmt.Sprintf("Couldn't parse purchase ID for deletion: %v", err))
 		return
 	}
-
+	respondWithJSON(w, 200, fmt.Sprintf("Purchase successfully deleted by %v", user.Name))
 	
 }
