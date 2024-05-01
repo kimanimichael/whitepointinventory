@@ -3,7 +3,11 @@ INSERT INTO purchases(id, created_at, updated_at, chicken, price_per_chicken, us
 VALUES($1, $2, $3, $4, $5, $6, $7)
 RETURNING *;
 
--- name: GetPurchase :one
+-- name: GetPurchases :many
+
+SELECT * FROM purchases;
+
+-- name: GetPurchaseByID :one
 
 SELECT * FROM purchases
 WHERE id = $1;
