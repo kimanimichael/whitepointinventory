@@ -61,14 +61,14 @@ func (q *Queries) DeletePurchase(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
-const getPurchase = `-- name: GetPurchase :one
+const getPurchaseByID = `-- name: GetPurchaseByID :one
 
 SELECT id, created_at, updated_at, chicken, price_per_chicken, user_id, farmer_id FROM purchases
 WHERE id = $1
 `
 
-func (q *Queries) GetPurchase(ctx context.Context, id uuid.UUID) (Purchase, error) {
-	row := q.db.QueryRowContext(ctx, getPurchase, id)
+func (q *Queries) GetPurchaseByID(ctx context.Context, id uuid.UUID) (Purchase, error) {
+	row := q.db.QueryRowContext(ctx, getPurchaseByID, id)
 	var i Purchase
 	err := row.Scan(
 		&i.ID,
@@ -80,4 +80,40 @@ func (q *Queries) GetPurchase(ctx context.Context, id uuid.UUID) (Purchase, erro
 		&i.FarmerID,
 	)
 	return i, err
+}
+
+const getPurchases = `-- name: GetPurchases :many
+
+SELECT id, created_at, updated_at, chicken, price_per_chicken, user_id, farmer_id FROM purchases
+`
+
+func (q *Queries) GetPurchases(ctx context.Context) ([]Purchase, error) {
+	rows, err := q.db.QueryContext(ctx, getPurchases)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Purchase
+	for rows.Next() {
+		var i Purchase
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Chicken,
+			&i.PricePerChicken,
+			&i.UserID,
+			&i.FarmerID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
