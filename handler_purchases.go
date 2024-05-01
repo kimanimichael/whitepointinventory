@@ -75,6 +75,36 @@ func (apiCfg *apiConfig)handerCreatePurchases(w http.ResponseWriter, r *http.Req
 	respondWithJSON(w, 201, purchase)
 }
 
+func (apiCfg *apiConfig) handlerGetPurchases (w http.ResponseWriter, r *http.Request) {
+	purchases, err := apiCfg.DB.GetPurchases(r.Context())
+	if err != nil {
+		respondWithError(w, 400, fmt.Sprintf("Couldn't fetch purchases: %v", err))
+		return
+	}
+
+	respondWithJSON(w, 200, purchases)
+}
+
+func (apiCfg *apiConfig) handlerGetPurchaseByID (w http.ResponseWriter, r *http.Request) {
+	type parameters struct {
+		ID uuid.UUID `json:"purchase_id"`
+	}
+	params := parameters{}
+
+	decode := json.NewDecoder(r.Body)
+	err := decode.Decode(&params)
+	if err != nil {
+		respondWithError(w, 400, fmt.Sprintf("Couldn't decode JSON: %v", err))
+		return
+	}
+
+	purchase, err := apiCfg.DB.GetPurchaseByID(r.Context(), params.ID)
+	if err != nil {
+		respondWithError(w, 400, fmt.Sprintf("Couldn't get purchase: %v", err))
+	}
+	respondWithJSON(w, 200, purchase)
+}
+
 func (apiCfg *apiConfig) handlerDeletePurchase(w http.ResponseWriter, r *http.Request, user database.User) {
 	purchaseIDStr := chi.URLParam(r, "purchase_id")
 	purchaseID, err := uuid.Parse(purchaseIDStr)
@@ -83,7 +113,7 @@ func (apiCfg *apiConfig) handlerDeletePurchase(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	purchase, err := apiCfg.DB.GetPurchase(r.Context(), purchaseID)
+	purchase, err := apiCfg.DB.GetPurchaseByID(r.Context(), purchaseID)
 	if err != nil {
 		respondWithError(w, 400, fmt.Sprintf("Couldn't fetch purchase for deletion: %v",err))
 		return
