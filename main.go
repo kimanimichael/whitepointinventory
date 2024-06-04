@@ -18,6 +18,19 @@ type apiConfig struct {
 	DB *database.Queries
 }
 
+func newTestRouter(route string, handler http.HandlerFunc) *chi.Mux {
+	r := chi.NewRouter()
+	r.Get(route, handler)
+
+	staticFileDirectory := http.Dir("./assets/")
+	
+	staticFileHandler := http.StripPrefix("/assets/", http.FileServer(staticFileDirectory))
+
+	
+
+	return r
+}
+
 func main()  {
 	fmt.Println("Welcome to whitepoint invetory")
 
@@ -47,9 +60,10 @@ func main()  {
 	}
 
 	router := chi.NewRouter()
-	v1Router := chi.NewRouter()
+	// v1Router := chi.NewRouter()
+	v1Router := newTestRouter("/healthz", handlerHealth)
 
-	v1Router.Get("/healthz", handlerHealth)
+	// v1Router.Get("/healthz", handlerHealth)
 	v1Router.Post("/users", apiCfg.handlerCreateUser)
 	v1Router.Post("/farmers", apiCfg.handlerCreateFarmer)
 	v1Router.Get("/farmers", apiCfg.handlerGetFarmerByName)
