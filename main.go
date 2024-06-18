@@ -10,7 +10,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/joho/godotenv"
 	"github.com/mike-kimani/whitepointinventory/internal/database"
-	
+
 	_ "github.com/lib/pq"
 )
 
@@ -18,8 +18,8 @@ type apiConfig struct {
 	DB *database.Queries
 }
 
-func main()  {
-	fmt.Println("Welcome to whitepoint invetory")
+func main() {
+	fmt.Println("Welcome to White Point inventory")
 
 	godotenv.Load(".env")
 
@@ -34,7 +34,7 @@ func main()  {
 		log.Fatal("DB_URL not found in this environment")
 	}
 
-	conn, err := sql.Open("postgres", dbURL)	
+	conn, err := sql.Open("postgres", dbURL)
 	if err != nil {
 		fmt.Println("Error: ", err)
 		log.Fatal("Cannot connect to database")
@@ -42,7 +42,7 @@ func main()  {
 
 	db := database.New(conn)
 
-	apiCfg := apiConfig {
+	apiCfg := apiConfig{
 		DB: db,
 	}
 
@@ -59,16 +59,15 @@ func main()  {
 	v1Router.Get("/purchase", apiCfg.handlerGetPurchaseByID)
 	v1Router.Delete("/purchases/{purchase_id}", apiCfg.middlewareAuth(apiCfg.handlerDeletePurchase))
 	v1Router.Post("/payments", apiCfg.middlewareAuth(apiCfg.handlerCreatePayment))
-	v1Router.Get("/payment",apiCfg.handlerGetPaymentByID)
-	v1Router.Get("/payments",apiCfg.handlerGetPayments)
+	v1Router.Get("/payment", apiCfg.handlerGetPaymentByID)
+	v1Router.Get("/payments", apiCfg.handlerGetPayments)
 	v1Router.Delete("/payments/{payment_id}", apiCfg.middlewareAuth(apiCfg.handlerDeletePayment))
-	
 
 	router.Mount("/v1", v1Router)
 
 	srv := &http.Server{
 		Handler: router,
-		Addr: ":" + portstring,
+		Addr:    ":" + portstring,
 	}
 	log.Printf("Server starting on port %v", portstring)
 
