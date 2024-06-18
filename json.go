@@ -29,3 +29,13 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.WriteHeader(code)
 	w.Write(dat)
 }
+
+func respondWithoutJSON(w http.ResponseWriter, code int, payload interface{}) {
+	dat, err := json.Marshal(payload)
+	if err != nil {
+		log.Printf("Unable to marshal JSON from paload err: %v", err)
+	}
+	w.Header().Add("Content-Type","application/json")
+	w.WriteHeader(code)
+	w.Write(dat)
+}
