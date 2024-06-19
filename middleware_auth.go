@@ -10,8 +10,8 @@ import (
 
 type authedHandler func(http.ResponseWriter, *http.Request, database.User)
 
-func (apiCfg *apiConfig) middlewareAuth (handler authedHandler) http.HandlerFunc{
-	return func (w http.ResponseWriter, r *http.Request)  {
+func (apiCfg *apiConfig) middlewareAuth(handler authedHandler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		password, email, err := auth.GetPasswordAndEmail(r.Header)
 		if err != nil {
 			respondWithError(w, 400, fmt.Sprintf("Auth error: %v", err))
@@ -20,7 +20,7 @@ func (apiCfg *apiConfig) middlewareAuth (handler authedHandler) http.HandlerFunc
 
 		user, err := apiCfg.DB.GetUserByPasswordAndEmail(r.Context(), database.GetUserByPasswordAndEmailParams{
 			Password: password,
-			Email: email,
+			Email:    email,
 		})
 		if err != nil {
 			respondWithError(w, 400, fmt.Sprintf("Couldn't get user: %v", err))
