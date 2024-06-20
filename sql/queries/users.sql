@@ -10,3 +10,6 @@ SELECT * FROM users WHERE api_key = $1;
 
 -- name: GetUserByPasswordAndEmail :one
 SELECT * FROM users WHERE password = $1 AND email = $2;
+
+-- name: GetUserByID :one
+SELECT * FROM users WHERE id = $1;
