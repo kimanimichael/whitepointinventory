@@ -12,10 +12,10 @@ import (
 	"github.com/mike-kimani/whitepointinventory/internal/database"
 )
 
-func (apiCfg *apiConfig)handerCreatePurchases(w http.ResponseWriter, r *http.Request, user database.User) {
+func (apiCfg *apiConfig) handerCreatePurchases(w http.ResponseWriter, r *http.Request, user database.User) {
 	type parameters struct {
-		Chicken int32 `json:"chicken_no"`
-		Price int32 `json:"chicken_price"`
+		Chicken  int32     `json:"chicken_no"`
+		Price    int32     `json:"chicken_price"`
 		FarmerID uuid.UUID `json:"farmer_id"`
 	}
 
@@ -23,25 +23,25 @@ func (apiCfg *apiConfig)handerCreatePurchases(w http.ResponseWriter, r *http.Req
 	cash_balance := sql.NullInt32{}
 
 	params := parameters{}
-	
+
 	decode := json.NewDecoder(r.Body)
 	err := decode.Decode(&params)
-	if err!= nil {
+	if err != nil {
 		respondWithError(w, 400, fmt.Sprintf("Error decoding json: %v", err))
 		return
 	}
 
-	purchase, err :=  apiCfg.DB.CreatePurchase(r.Context(), database.CreatePurchaseParams{
-		ID: uuid.New(),
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-		Chicken: params.Chicken,
+	purchase, err := apiCfg.DB.CreatePurchase(r.Context(), database.CreatePurchaseParams{
+		ID:              uuid.New(),
+		CreatedAt:       time.Now(),
+		UpdatedAt:       time.Now(),
+		Chicken:         params.Chicken,
 		PricePerChicken: params.Price,
-		UserID: user.ID,
-		FarmerID: params.FarmerID,
+		UserID:          user.ID,
+		FarmerID:        params.FarmerID,
 	})
 
-	if err!= nil {
+	if err != nil {
 		respondWithError(w, 400, fmt.Sprintf("Error creating purchase: %v", err))
 		return
 	}
@@ -54,20 +54,20 @@ func (apiCfg *apiConfig)handerCreatePurchases(w http.ResponseWriter, r *http.Req
 
 	err = apiCfg.DB.IncreaseChickenOwed(r.Context(), database.IncreaseChickenOwedParams{
 		ChickenBalance: chicken_bought,
-		ID: params.FarmerID,
+		ID:             params.FarmerID,
 	})
 
-	if err!= nil {
+	if err != nil {
 		respondWithError(w, 400, fmt.Sprintf("Error adding chicken owed to farmer database: %v", err))
 		return
 	}
 
 	err = apiCfg.DB.IncreaseCashOwed(r.Context(), database.IncreaseCashOwedParams{
 		CashBalance: cash_balance,
-		ID: params.FarmerID,
+		ID:          params.FarmerID,
 	})
 
-	if err!= nil {
+	if err != nil {
 		respondWithError(w, 400, fmt.Sprintf("Error adding cash owed to farmer database: %v", err))
 		return
 	}
@@ -115,7 +115,7 @@ func (apiCfg *apiConfig) handlerDeletePurchase(w http.ResponseWriter, r *http.Re
 
 	purchase, err := apiCfg.DB.GetPurchaseByID(r.Context(), purchaseID)
 	if err != nil {
-		respondWithError(w, 400, fmt.Sprintf("Couldn't fetch purchase for deletion: %v",err))
+		respondWithError(w, 400, fmt.Sprintf("Couldn't fetch purchase for deletion: %v", err))
 		return
 	}
 
@@ -125,7 +125,7 @@ func (apiCfg *apiConfig) handlerDeletePurchase(w http.ResponseWriter, r *http.Re
 
 	err = apiCfg.DB.DecreaseChickenOwed(r.Context(), database.DecreaseChickenOwedParams{
 		ChickenBalance: chicken_balance,
-		ID: purchase.FarmerID,
+		ID:             purchase.FarmerID,
 	})
 	if err != nil {
 		respondWithError(w, 400, fmt.Sprintf("Couldn't decrease chicken owed: %v", err))
@@ -138,7 +138,7 @@ func (apiCfg *apiConfig) handlerDeletePurchase(w http.ResponseWriter, r *http.Re
 
 	err = apiCfg.DB.DecreaseCashOwed(r.Context(), database.DecreaseCashOwedParams{
 		CashBalance: cash_balance,
-		ID: purchase.FarmerID,
+		ID:          purchase.FarmerID,
 	})
 	if err != nil {
 		respondWithError(w, 400, fmt.Sprintf("Couldn't decrease cash owed: %v", err))
@@ -151,5 +151,5 @@ func (apiCfg *apiConfig) handlerDeletePurchase(w http.ResponseWriter, r *http.Re
 		return
 	}
 	respondWithJSON(w, 200, fmt.Sprintf("Purchase successfully deleted by %v", user.Name))
-	
+
 }
