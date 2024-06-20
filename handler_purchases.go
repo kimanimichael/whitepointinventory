@@ -75,7 +75,7 @@ func (apiCfg *apiConfig) handerCreatePurchases(w http.ResponseWriter, r *http.Re
 	respondWithJSON(w, 201, purchase)
 }
 
-func (apiCfg *apiConfig) handlerGetPurchases (w http.ResponseWriter, r *http.Request) {
+func (apiCfg *apiConfig) handlerGetPurchases(w http.ResponseWriter, r *http.Request) {
 	purchases, err := apiCfg.DB.GetPurchases(r.Context())
 	if err != nil {
 		respondWithError(w, 400, fmt.Sprintf("Couldn't fetch purchases: %v", err))
@@ -85,7 +85,7 @@ func (apiCfg *apiConfig) handlerGetPurchases (w http.ResponseWriter, r *http.Req
 	respondWithJSON(w, 200, purchases)
 }
 
-func (apiCfg *apiConfig) handlerGetPurchaseByID (w http.ResponseWriter, r *http.Request) {
+func (apiCfg *apiConfig) handlerGetPurchaseByID(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
 		ID uuid.UUID `json:"purchase_id"`
 	}
