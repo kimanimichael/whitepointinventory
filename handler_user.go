@@ -11,15 +11,17 @@ import (
 	"github.com/mike-kimani/whitepointinventory/internal/database"
 )
 
-func (apiCfg *apiConfig)handlerCreateUser(w http.ResponseWriter, r *http.Request) {
+const SecretKey = "secret"
+
+func (apiCfg *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
-		Name string `json:"name"`
+		Name     string `json:"name"`
 		Password string `json:"password"`
-		Email string `json:"email_address"`
+		Email    string `json:"email_address"`
 	}
 
 	decoder := json.NewDecoder(r.Body)
-	
+
 	params := parameters{}
 
 	err := decoder.Decode(&params)
@@ -54,12 +56,12 @@ func (apiCfg *apiConfig)handlerCreateUser(w http.ResponseWriter, r *http.Request
 	}
 
 	user, err := apiCfg.DB.CreateUser(r.Context(), database.CreateUserParams{
-		ID: uuid.New(),
+		ID:        uuid.New(),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
-		Name: params.Name,
-		Password: params.Password,
-		Email: params.Email,
+		Name:      params.Name,
+		Password:  params.Password,
+		Email:     params.Email,
 	})
 
 	if err != nil {
