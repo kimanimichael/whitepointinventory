@@ -3,6 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/mike-kimani/whitepointinventory/auth"
 	"net/http"
 	"strings"
 	"time"
@@ -69,4 +71,62 @@ func (apiCfg *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	respondWithJSON(w, 201, user)
+}
+
+func (apiCfg *apiConfig) handlerUserLogin(w http.ResponseWriter, r *http.Request) {
+
+	email, password, err := auth.GetPasswordAndEmailFromBody(r)
+	if err != nil {
+		respondWithError(w, 400, fmt.Sprintf("Auth error: %v", err))
+		return
+	}
+
+	user, err := apiCfg.DB.GetUserByPasswordAndEmail(r.Context(), database.GetUserByPasswordAndEmailParams{
+		Password: password,
+		Email:    email,
+	})
+	if err != nil {
+		respondWithError(w, 404, fmt.Sprintf("User not found: %v", err))
+		return
+	}
+	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
+		Issuer:    user.ID.String(),
+		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+	})
+	token, err := claims.SignedString([]byte(SecretKey))
+	if err != nil {
+		respondWithError(w, 400, fmt.Sprintf("Couldn't get token: %v", err))
+	}
+
+	cookie := http.Cookie{
+		Name:     "jwt",
+		Value:    token,
+		Expires:  time.Now().Add(time.Hour * 24),
+		HttpOnly: true,
+	}
+	http.SetCookie(w, &cookie)
+	respondWithJSON(w, 200, user)
+}
+
+func (apiCfg *apiConfig) handlerGetUserFromCookie(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("jwt")
+	if err != nil {
+		respondWithError(w, 404, fmt.Sprintf("Couldn't get cookie: %v", err))
+		return
+	}
+	tokenString := cookie.Value
+	token, err := jwt.ParseWithClaims(tokenString, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(SecretKey), nil
+	})
+	if err != nil {
+		respondWithError(w, 404, fmt.Sprintf("Couldn't parse token: %v", err))
+	}
+	claims := token.Claims.(*jwt.StandardClaims)
+	userID, err := uuid.Parse(claims.Issuer)
+
+	user, err := apiCfg.DB.GetUserByID(r.Context(), userID)
+	if err != nil {
+		respondWithError(w, 404, fmt.Sprintf("User not found: %v", err))
+	}
+	respondWithJSON(w, 200, user)
 }
