@@ -42,7 +42,6 @@ func GetPasswordAndEmail(headers http.Header) (string, string, error) {
 	if !strings.Contains(valsName[1], "@") {
 		return "", "", errors.New("malformed authentication info:Bad email entered")
 	}
-	
-	
+
 	return valsPassword[1], valsName[1], nil
 }
