@@ -90,6 +90,24 @@ func (q *Queries) DeleteFarmers(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
+const getFarmerByID = `-- name: GetFarmerByID :one
+SELECT id, created_at, updated_at, name, chicken_balance, cash_balance FROM farmers where id = $1
+`
+
+func (q *Queries) GetFarmerByID(ctx context.Context, id uuid.UUID) (Farmer, error) {
+	row := q.db.QueryRowContext(ctx, getFarmerByID, id)
+	var i Farmer
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Name,
+		&i.ChickenBalance,
+		&i.CashBalance,
+	)
+	return i, err
+}
+
 const getFarmerByName = `-- name: GetFarmerByName :one
 SELECT id, created_at, updated_at, name, chicken_balance, cash_balance FROM farmers where name = $1
 `

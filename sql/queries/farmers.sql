@@ -29,3 +29,5 @@ UPDATE farmers
 SET cash_balance = COALESCE(cash_balance, 0) - ($1)
 WHERE farmers.id = $2;
 
+-- name: GetFarmerByID :one
+SELECT * FROM farmers where id = $1;
