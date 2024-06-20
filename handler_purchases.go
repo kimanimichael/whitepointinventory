@@ -81,8 +81,28 @@ func (apiCfg *apiConfig) handlerGetPurchases(w http.ResponseWriter, r *http.Requ
 		respondWithError(w, 400, fmt.Sprintf("Couldn't fetch purchases: %v", err))
 		return
 	}
+	purchasesWithNames := []Purchase{}
+	purchasesToPublish := []Purchase{}
 
-	respondWithJSON(w, 200, purchases)
+	for _, purchase := range purchases {
+		purchasesWithNames = append(purchasesWithNames, databasePurchaseToPurchase(purchase))
+	}
+	for _, purchaseWithName := range purchasesWithNames {
+		user, err := apiCfg.DB.GetUserByID(r.Context(), purchaseWithName.UserID)
+		if err != nil {
+			respondWithError(w, 404, fmt.Sprintf("Couldn't fetch user: %v", err))
+			return
+		}
+		purchaseWithName.UserName = user.Name
+		farmer, err := apiCfg.DB.GetFarmerByID(r.Context(), purchaseWithName.FarmerID)
+		if err != nil {
+			respondWithError(w, 404, fmt.Sprintf("Couldn't fetch farmer: %v", err))
+			return
+		}
+		purchaseWithName.FarmerName = farmer.Name
+		purchasesToPublish = append(purchasesToPublish, purchaseWithName)
+	}
+	respondWithJSON(w, 200, purchasesToPublish)
 }
 
 func (apiCfg *apiConfig) handlerGetPurchaseByID(w http.ResponseWriter, r *http.Request) {
