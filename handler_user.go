@@ -130,3 +130,13 @@ func (apiCfg *apiConfig) handlerGetUserFromCookie(w http.ResponseWriter, r *http
 	}
 	respondWithJSON(w, 200, user)
 }
+
+func (apiCfg *apiConfig) handlerUserLogout(w http.ResponseWriter, r *http.Request) {
+	cookie := http.Cookie{
+		Name:     "jwt",
+		Value:    "",
+		Expires:  time.Now().Add(-time.Hour),
+		HttpOnly: true,
+	}
+	http.SetCookie(w, &cookie)
+}
