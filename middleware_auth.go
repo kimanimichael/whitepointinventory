@@ -2,10 +2,9 @@ package main
 
 import (
 	"fmt"
-	"net/http"
-
 	"github.com/mike-kimani/whitepointinventory/auth"
 	"github.com/mike-kimani/whitepointinventory/internal/database"
+	"net/http"
 )
 
 type authedHandler func(http.ResponseWriter, *http.Request, database.User)
