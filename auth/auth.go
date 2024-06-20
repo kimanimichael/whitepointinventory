@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 	"strings"
@@ -44,4 +45,31 @@ func GetPasswordAndEmail(headers http.Header) (string, string, error) {
 	}
 
 	return valsPassword[1], valsName[1], nil
+}
+
+func GetPasswordAndEmailFromBody(r *http.Request) (string, string, error) {
+	type parameters struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+	decoder := json.NewDecoder(r.Body)
+
+	params := parameters{}
+	err := decoder.Decode(&params)
+	if err != nil {
+		return "", "", err
+	}
+
+	if params.Email == "" || params.Password == "" {
+		return "", "", errors.New("empty, email or password")
+	}
+
+	if !strings.Contains(params.Email, "@") {
+		return "", "", errors.New("email malformed missing @")
+	}
+	if !strings.Contains(params.Email, ".") {
+		return "", "", errors.New("email malformed missing a period")
+	}
+
+	return params.Email, params.Password, nil
 }
