@@ -10,10 +10,10 @@ import (
 Get Password from http header
 Authorization Password {Insert Password here}:Email {Insert Email here}
 */
-func GetPasswordAndEmail(headers http.Header)(string, string, error) {
+func GetPasswordAndEmail(headers http.Header) (string, string, error) {
 	val := headers.Get("Authorization")
 	if val == "" {
-		return "", "",  errors.New("no authentication info found")
+		return "", "", errors.New("no authentication info found")
 	}
 
 	vals := strings.Split(val, ":")
