@@ -30,7 +30,6 @@ func GetPasswordAndEmail(headers http.Header) (string, string, error) {
 		return "", "", errors.New("malformed authentication info:Password phrase missing")
 	}
 
-
 	valName := vals[1]
 	valsName := strings.Split(valName, " ")
 	if len(valsName) < 2 {
