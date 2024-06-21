@@ -84,7 +84,7 @@ func (q *Queries) GetPurchaseByID(ctx context.Context, id uuid.UUID) (Purchase, 
 
 const getPurchases = `-- name: GetPurchases :many
 
-SELECT id, created_at, updated_at, chicken, price_per_chicken, user_id, farmer_id FROM purchases
+SELECT id, created_at, updated_at, chicken, price_per_chicken, user_id, farmer_id FROM purchases ORDER BY created_at DESC
 `
 
 func (q *Queries) GetPurchases(ctx context.Context) ([]Purchase, error) {

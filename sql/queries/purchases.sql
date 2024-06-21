@@ -5,7 +5,7 @@ RETURNING *;
 
 -- name: GetPurchases :many
 
-SELECT * FROM purchases;
+SELECT * FROM purchases ORDER BY created_at DESC;
 
 -- name: GetPurchaseByID :one
 
