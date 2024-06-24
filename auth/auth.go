@@ -47,6 +47,26 @@ func GetPasswordAndEmail(headers http.Header) (string, string, error) {
 	return valsPassword[1], valsName[1], nil
 }
 
+func GetAPIKey(headers http.Header) (string, error) {
+	val := headers.Get("Authorization")
+	if val == "" {
+		return "", errors.New("no authentication info found in header")
+	}
+	vals := strings.Split(val, ":")
+	if len(vals) != 2 {
+		return "", errors.New("malformed authentication info:Wrong auth format")
+	}
+	valHeaderName := vals[0]
+	if valHeaderName != "APIKey" {
+		return "", errors.New("malformed authentication info:Wrong auth header - Bad header name")
+	}
+	valHeaderValue := vals[1]
+	if valHeaderValue == "" {
+		return "", errors.New("malformed authentication info:Wrong auth header - No APIKey")
+	}
+	return valHeaderValue, nil
+}
+
 func GetPasswordAndEmailFromBody(r *http.Request) (string, string, error) {
 	type parameters struct {
 		Email    string `json:"email"`
