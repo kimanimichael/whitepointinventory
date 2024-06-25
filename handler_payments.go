@@ -74,12 +74,34 @@ func (apiCfg * apiConfig) handlerCreatePayment(w http.ResponseWriter, r *http.Re
 }
 
 func (apiCfg *apiConfig) handlerGetPayments(w http.ResponseWriter, r *http.Request) {
+	customPayments := []Payment{}
+	paymentResponse := []Payment{}
+
 	payments, err := apiCfg.DB.GetPayments(r.Context())
 	if err != nil {
 		respondWithError(w, 400, fmt.Sprintf("Couldn't fetch payments: %v", err))
 	}
 
-	respondWithJSON(w, 200, payments)
+	for _, payment := range payments {
+		customPayments = append(customPayments, databasePaymentToPayment(payment))
+	}
+	for _, customPayment := range customPayments {
+		user, err := apiCfg.DB.GetUserByID(r.Context(), customPayment.UserID)
+		if err != nil {
+			respondWithError(w, 400, fmt.Sprintf("Couldn't fetch user: %v", err))
+			return
+		}
+		farmer, err := apiCfg.DB.GetFarmerByID(r.Context(), customPayment.FarmerID)
+		if err != nil {
+			respondWithError(w, 400, fmt.Sprintf("Couldn't fetch farmer: %v", err))
+			return
+		}
+		customPayment.UserName = user.Name
+		customPayment.FarmerName = farmer.Name
+		paymentResponse = append(paymentResponse, customPayment)
+	}
+
+	respondWithJSON(w, 200, paymentResponse)
 }
 
 func (apiCfg *apiConfig) handlerGetPaymentByID(w http.ResponseWriter, r * http.Request) {
