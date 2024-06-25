@@ -12,16 +12,15 @@ import (
 	"github.com/mike-kimani/whitepointinventory/internal/database"
 )
 
-
-func (apiCfg * apiConfig) handlerCreatePayment(w http.ResponseWriter, r *http.Request, user database.User) {
-	type parameters struct{
-		Cash int32 `json:"cash_paid"`
-		PricePerChicken int32 `json:"price_per_chicken_paid"`
-		FarmerID uuid.UUID `json:"farmer_id"`
+func (apiCfg *apiConfig) handlerCreatePayment(w http.ResponseWriter, r *http.Request, user database.User) {
+	type parameters struct {
+		Cash            int32     `json:"cash_paid"`
+		PricePerChicken int32     `json:"price_per_chicken_paid"`
+		FarmerID        uuid.UUID `json:"farmer_id"`
 	}
 	params := parameters{}
 
-	cash_balance :=  sql.NullInt32{}
+	cash_balance := sql.NullInt32{}
 
 	chicken_balance := sql.NullInt32{}
 
@@ -34,13 +33,13 @@ func (apiCfg * apiConfig) handlerCreatePayment(w http.ResponseWriter, r *http.Re
 	}
 
 	payment, err := apiCfg.DB.CreatePayment(r.Context(), database.CreatePaymentParams{
-		ID: uuid.New(),
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-		CashPaid: params.Cash,
+		ID:                  uuid.New(),
+		CreatedAt:           time.Now(),
+		UpdatedAt:           time.Now(),
+		CashPaid:            params.Cash,
 		PricePerChickenPaid: params.PricePerChicken,
-		UserID: user.ID,
-		FarmerID: params.FarmerID,
+		UserID:              user.ID,
+		FarmerID:            params.FarmerID,
 	})
 	if err != nil {
 		respondWithError(w, 400, fmt.Sprintf("Couldn't create purchase: %v", err))
@@ -50,12 +49,12 @@ func (apiCfg * apiConfig) handlerCreatePayment(w http.ResponseWriter, r *http.Re
 	cash_balance.Int32 = params.Cash
 	cash_balance.Valid = true
 	// TODO: Handle operations that result in floats
-	chicken_balance.Int32 = params.Cash/params.PricePerChicken
+	chicken_balance.Int32 = params.Cash / params.PricePerChicken
 	chicken_balance.Valid = true
 
 	err = apiCfg.DB.DecreaseCashOwed(r.Context(), database.DecreaseCashOwedParams{
 		CashBalance: cash_balance,
-		ID: params.FarmerID,
+		ID:          params.FarmerID,
 	})
 
 	if err != nil {
@@ -64,7 +63,7 @@ func (apiCfg * apiConfig) handlerCreatePayment(w http.ResponseWriter, r *http.Re
 
 	err = apiCfg.DB.DecreaseChickenOwed(r.Context(), database.DecreaseChickenOwedParams{
 		ChickenBalance: chicken_balance,
-		ID: params.FarmerID,
+		ID:             params.FarmerID,
 	})
 	if err != nil {
 		respondWithError(w, 400, fmt.Sprintf("Couldn't decrease chicken owed to the farmer: %v", err))
@@ -104,8 +103,8 @@ func (apiCfg *apiConfig) handlerGetPayments(w http.ResponseWriter, r *http.Reque
 	respondWithJSON(w, 200, paymentResponse)
 }
 
-func (apiCfg *apiConfig) handlerGetPaymentByID(w http.ResponseWriter, r * http.Request) {
-	type parameters struct{
+func (apiCfg *apiConfig) handlerGetPaymentByID(w http.ResponseWriter, r *http.Request) {
+	type parameters struct {
 		ID uuid.UUID `json:"payment_id"`
 	}
 	params := parameters{}
@@ -144,12 +143,12 @@ func (apiCfg *apiConfig) handlerDeletePayment(w http.ResponseWriter, r *http.Req
 	cash_balance.Int32 = payment.CashPaid
 	cash_balance.Valid = true
 	// TODO: Handle operations that result in floats
-	chicken_owed.Int32 = payment.CashPaid/payment.PricePerChickenPaid
+	chicken_owed.Int32 = payment.CashPaid / payment.PricePerChickenPaid
 	chicken_owed.Valid = true
 
 	err = apiCfg.DB.IncreaseCashOwed(r.Context(), database.IncreaseCashOwedParams{
 		CashBalance: cash_balance,
-		ID: payment.FarmerID,
+		ID:          payment.FarmerID,
 	})
 	if err != nil {
 		respondWithError(w, 400, fmt.Sprintf("Couldn't increase cash owned: %v", err))
@@ -158,14 +157,14 @@ func (apiCfg *apiConfig) handlerDeletePayment(w http.ResponseWriter, r *http.Req
 
 	err = apiCfg.DB.IncreaseChickenOwed(r.Context(), database.IncreaseChickenOwedParams{
 		ChickenBalance: chicken_owed,
-		ID: payment.FarmerID,
+		ID:             payment.FarmerID,
 	})
 	if err != nil {
 		respondWithError(w, 400, fmt.Sprintf("Couldn't increase chicken owed: %v", err))
 		return
 	}
-	
-	err =  apiCfg.DB.DeletePayments(r.Context(), payment.ID)
+
+	err = apiCfg.DB.DeletePayments(r.Context(), payment.ID)
 	if err != nil {
 		respondWithError(w, 400, fmt.Sprintf("Couldn't delete payment: %v", err))
 		return
