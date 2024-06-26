@@ -14,9 +14,9 @@ import (
 
 func (apiCfg *apiConfig) handlerCreatePayment(w http.ResponseWriter, r *http.Request, user database.User) {
 	type parameters struct {
-		Cash            int32     `json:"cash_paid"`
-		PricePerChicken int32     `json:"price_per_chicken_paid"`
-		FarmerID        uuid.UUID `json:"farmer_id"`
+		Cash            int32  `json:"cash_paid"`
+		PricePerChicken int32  `json:"price_per_chicken_paid"`
+		FarmerName      string `json:"farmer_name"`
 	}
 	params := parameters{}
 
@@ -32,6 +32,11 @@ func (apiCfg *apiConfig) handlerCreatePayment(w http.ResponseWriter, r *http.Req
 		return
 	}
 
+	farmer, err := apiCfg.DB.GetFarmerByName(r.Context(), params.FarmerName)
+	if err != nil {
+		respondWithError(w, 404, fmt.Sprintf("Couldn't find farmer by name: %v", err))
+	}
+
 	payment, err := apiCfg.DB.CreatePayment(r.Context(), database.CreatePaymentParams{
 		ID:                  uuid.New(),
 		CreatedAt:           time.Now(),
@@ -39,7 +44,7 @@ func (apiCfg *apiConfig) handlerCreatePayment(w http.ResponseWriter, r *http.Req
 		CashPaid:            params.Cash,
 		PricePerChickenPaid: params.PricePerChicken,
 		UserID:              user.ID,
-		FarmerID:            params.FarmerID,
+		FarmerID:            farmer.ID,
 	})
 	if err != nil {
 		respondWithError(w, 400, fmt.Sprintf("Couldn't create purchase: %v", err))
@@ -54,7 +59,7 @@ func (apiCfg *apiConfig) handlerCreatePayment(w http.ResponseWriter, r *http.Req
 
 	err = apiCfg.DB.DecreaseCashOwed(r.Context(), database.DecreaseCashOwedParams{
 		CashBalance: cash_balance,
-		ID:          params.FarmerID,
+		ID:          farmer.ID,
 	})
 
 	if err != nil {
@@ -63,7 +68,7 @@ func (apiCfg *apiConfig) handlerCreatePayment(w http.ResponseWriter, r *http.Req
 
 	err = apiCfg.DB.DecreaseChickenOwed(r.Context(), database.DecreaseChickenOwedParams{
 		ChickenBalance: chicken_balance,
-		ID:             params.FarmerID,
+		ID:             farmer.ID,
 	})
 	if err != nil {
 		respondWithError(w, 400, fmt.Sprintf("Couldn't decrease chicken owed to the farmer: %v", err))
