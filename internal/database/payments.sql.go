@@ -81,7 +81,7 @@ func (q *Queries) GetPaymentByID(ctx context.Context, id uuid.UUID) (Payment, er
 }
 
 const getPayments = `-- name: GetPayments :many
-SELECT id, created_at, updated_at, cash_paid, price_per_chicken_paid, user_id, farmer_id FROM payments
+SELECT id, created_at, updated_at, cash_paid, price_per_chicken_paid, user_id, farmer_id FROM payments ORDER BY created_at DESC
 `
 
 func (q *Queries) GetPayments(ctx context.Context) ([]Payment, error) {
