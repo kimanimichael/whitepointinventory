@@ -98,3 +98,11 @@ func (apiCfg *apiConfig) handlerDeleteFarmer(w http.ResponseWriter, r *http.Requ
 	}
 	respondWithJSON(w, 200, struct{}{})
 }
+
+func (apiCfg *apiConfig) handlerGetFarmers(w http.ResponseWriter, r *http.Request) {
+	farmers, err := apiCfg.DB.GetFarmers(r.Context())
+	if err != nil {
+		respondWithError(w, 404, fmt.Sprintf("Couldn't get farmers: %v", err))
+	}
+	respondWithJSON(w, 200, databaseFarmersToFarmers(farmers))
+}
