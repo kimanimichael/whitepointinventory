@@ -77,6 +77,13 @@ func (apiCfg *apiConfig) handerCreatePurchases(w http.ResponseWriter, r *http.Re
 		return
 	}
 
+	err = apiCfg.DB.MarkFarmerAsUpdated(r.Context(), farmer.ID)
+	if err != nil {
+		respondWithError(w, 500, fmt.Sprintf("Error updating farmer: %v", err))
+	}
+
+	fmt.Printf("Farmer %v updated at updated to %v\n", farmer.Name, time.Now())
+
 	respondWithJSON(w, 201, purchase)
 }
 

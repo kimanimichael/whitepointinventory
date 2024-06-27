@@ -35,6 +35,7 @@ func (apiCfg *apiConfig) handlerCreatePayment(w http.ResponseWriter, r *http.Req
 	farmer, err := apiCfg.DB.GetFarmerByName(r.Context(), params.FarmerName)
 	if err != nil {
 		respondWithError(w, 404, fmt.Sprintf("Couldn't find farmer by name: %v", err))
+		return
 	}
 
 	payment, err := apiCfg.DB.CreatePayment(r.Context(), database.CreatePaymentParams{
@@ -73,6 +74,12 @@ func (apiCfg *apiConfig) handlerCreatePayment(w http.ResponseWriter, r *http.Req
 	if err != nil {
 		respondWithError(w, 400, fmt.Sprintf("Couldn't decrease chicken owed to the farmer: %v", err))
 	}
+	err = apiCfg.DB.MarkFarmerAsUpdated(r.Context(), farmer.ID)
+	if err != nil {
+		respondWithError(w, 400, fmt.Sprintf("Couldn't mark farmer as updated: %v", err))
+	}
+
+	fmt.Printf("Farmer %v updated at updated to %v\n", farmer.Name, time.Now())
 
 	respondWithJSON(w, 201, payment)
 }
