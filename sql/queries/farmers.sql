@@ -31,3 +31,6 @@ WHERE farmers.id = $2;
 
 -- name: GetFarmerByID :one
 SELECT * FROM farmers where id = $1;
+
+-- name: GetFarmers :many
+SELECT * FROM farmers ORDER BY updated_at DESC;
