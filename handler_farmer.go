@@ -12,13 +12,12 @@ import (
 	"github.com/mike-kimani/whitepointinventory/internal/database"
 )
 
-func(apiCfg *apiConfig) handlerCreateFarmer(w http.ResponseWriter, r *http.Request) {
+func (apiCfg *apiConfig) handlerCreateFarmer(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
-		Name string `json:"name"`
-		ChickenBalance int32 `json:"chicken_balance"`
-		CashBalance int32 `json:"cash_balance"`
+		Name           string `json:"name"`
+		ChickenBalance int32  `json:"chicken_balance"`
+		CashBalance    int32  `json:"cash_balance"`
 	}
-
 
 	params := parameters{}
 
@@ -44,12 +43,12 @@ func(apiCfg *apiConfig) handlerCreateFarmer(w http.ResponseWriter, r *http.Reque
 	}
 
 	farmer, err := apiCfg.DB.CreateFarmer(r.Context(), database.CreateFarmerParams{
-		ID: uuid.New(),
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-		Name: params.Name,
+		ID:             uuid.New(),
+		CreatedAt:      time.Now(),
+		UpdatedAt:      time.Now(),
+		Name:           params.Name,
 		ChickenBalance: chickenBalance,
-		CashBalance: cashBalance,
+		CashBalance:    cashBalance,
 	})
 	if err != nil {
 		respondWithError(w, 400, fmt.Sprintf("Couldn't create farmer: %v", err))
@@ -59,7 +58,7 @@ func(apiCfg *apiConfig) handlerCreateFarmer(w http.ResponseWriter, r *http.Reque
 	respondWithJSON(w, 200, farmer)
 }
 
-func(apiCfg *apiConfig) handlerGetFarmerByName(w http.ResponseWriter, r *http.Request) {
+func (apiCfg *apiConfig) handlerGetFarmerByName(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
 		Name string `json:"name"`
 	}
@@ -80,21 +79,20 @@ func(apiCfg *apiConfig) handlerGetFarmerByName(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-
 	respondWithJSON(w, 200, farmer)
 }
 
-func(apiCfg *apiConfig) handlerDeleteFarmer(w http.ResponseWriter, r *http.Request) {
-	
+func (apiCfg *apiConfig) handlerDeleteFarmer(w http.ResponseWriter, r *http.Request) {
+
 	farmerIDstr := chi.URLParam(r, "farmer_id")
 	farmerID, err := uuid.Parse(farmerIDstr)
-	if err!= nil {
+	if err != nil {
 		respondWithError(w, 400, fmt.Sprintf("Couldn't parse UUID for deletion: %v", err))
 		return
 	}
 
 	err = apiCfg.DB.DeleteFarmers(r.Context(), farmerID)
-	if err!= nil {
+	if err != nil {
 		respondWithError(w, 400, fmt.Sprintf("Couldn't delete farmer: %v", err))
 		return
 	}
