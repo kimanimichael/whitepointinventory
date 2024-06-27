@@ -30,6 +30,15 @@ type Payment struct {
 	FarmerName          string    `json:"farmer_name"`
 }
 
+type Farmer struct {
+	ID             uuid.UUID `json:"id"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
+	Name           string    `json:"name"`
+	ChickenBalance int32     `json:"chicken_balance"`
+	CashBalance    int32     `json:"cash_balance"`
+}
+
 func databasePurchaseToPurchase(dbPurchase database.Purchase) Purchase {
 	return Purchase{
 		ID:              dbPurchase.ID,
@@ -68,4 +77,23 @@ func databasePaymentsToPayments(dbPayments []database.Payment) []Payment {
 		payments = append(payments, databasePaymentToPayment(dbPayment))
 	}
 	return payments
+}
+
+func databaseFarmerToFarmer(dbFarmer database.Farmer) Farmer {
+	return Farmer{
+		ID:             dbFarmer.ID,
+		CreatedAt:      dbFarmer.CreatedAt,
+		UpdatedAt:      dbFarmer.UpdatedAt,
+		Name:           dbFarmer.Name,
+		ChickenBalance: dbFarmer.ChickenBalance.Int32,
+		CashBalance:    dbFarmer.CashBalance.Int32,
+	}
+}
+
+func databaseFarmersToFarmers(dbFarmers []database.Farmer) []Farmer {
+	farmers := []Farmer{}
+	for _, dbFarmer := range dbFarmers {
+		farmers = append(farmers, databaseFarmerToFarmer(dbFarmer))
+	}
+	return farmers
 }
