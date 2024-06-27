@@ -191,3 +191,14 @@ func (q *Queries) IncreaseChickenOwed(ctx context.Context, arg IncreaseChickenOw
 	_, err := q.db.ExecContext(ctx, increaseChickenOwed, arg.ChickenBalance, arg.ID)
 	return err
 }
+
+const markFarmerAsUpdated = `-- name: MarkFarmerAsUpdated :exec
+UPDATE farmers
+SET updated_at = NOW()
+WHERE id = $1
+`
+
+func (q *Queries) MarkFarmerAsUpdated(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, markFarmerAsUpdated, id)
+	return err
+}

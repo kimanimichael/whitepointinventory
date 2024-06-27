@@ -34,3 +34,8 @@ SELECT * FROM farmers where id = $1;
 
 -- name: GetFarmers :many
 SELECT * FROM farmers ORDER BY updated_at DESC;
+
+-- name: MarkFarmerAsUpdated :exec
+UPDATE farmers
+SET updated_at = NOW()
+WHERE id = $1;
