@@ -1,0 +1,28 @@
+# Use a base Go image
+FROM golang:1.21-alpine
+
+# Install Goose
+RUN go install github.com/pressly/goose/v3/cmd/goose@latest
+
+RUN apk update && apk add --no-cache postgresql-client
+
+# Set the working directory
+WORKDIR /app
+
+# Copy go.mod and go.sum files
+COPY go.mod go.sum ./
+
+# Download dependencies
+RUN go mod download
+
+# Copy the rest of the application source code
+COPY . .
+
+# Copy migration script
+COPY run_migrations.sh .
+
+# Make the migration script executable
+RUN chmod +x run_migrations.sh
+
+# Command to run migrations
+CMD ["./run_migrations.sh"]
