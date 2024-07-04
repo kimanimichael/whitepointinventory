@@ -40,6 +40,7 @@ func main() {
 		fmt.Println("Error: ", err)
 		log.Fatal("Cannot connect to database")
 	}
+	log.Println("Connected to database: ", dbURL)
 
 	db := database.New(conn)
 
