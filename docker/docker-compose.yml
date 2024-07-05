@@ -1,10 +1,5 @@
 services:
-  app:
-    build:
-      #Go back one directory
-      context: ..
-      dockerfile: docker/Dockerfile
-    image: whitepointinventoryservice
+  service:
     container_name: whitepointinventoryservice-container
     #Exposed api ports
     ports:
