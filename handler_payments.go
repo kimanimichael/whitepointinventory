@@ -12,6 +12,12 @@ import (
 	"github.com/mike-kimani/whitepointinventory/internal/database"
 )
 
+// MinCashPaid prevents swapping errors of cash paid and chicken price
+const MinCashPaid = 1000
+
+// MaxCashPaid prevents entry errors e.g. 400000 entry instead of 40000
+const MaxCashPaid = 100000
+
 func (apiCfg *apiConfig) handlerCreatePayment(w http.ResponseWriter, r *http.Request, user database.User) {
 	type parameters struct {
 		Cash            int32  `json:"cash_paid"`
@@ -29,6 +35,18 @@ func (apiCfg *apiConfig) handlerCreatePayment(w http.ResponseWriter, r *http.Req
 	err := decode.Decode(&params)
 	if err != nil {
 		respondWithError(w, 400, fmt.Sprintf("Couldn't decode json data into params: %v", err))
+		return
+	}
+	if params.FarmerName == "" {
+		respondWithError(w, 400, "Farmer name is required")
+		return
+	}
+	if params.Cash < MinCashPaid || params.Cash > MaxCashPaid {
+		respondWithError(w, 400, fmt.Sprintf("Cash paid must be between %d and %d", MinCashPaid, MaxCashPaid))
+		return
+	}
+	if params.PricePerChicken < MinChickenPrice || params.PricePerChicken > MaxChickenPrice {
+		respondWithError(w, 400, fmt.Sprintf("Chicken price must be within %d and %d", MinChickenPrice, MaxChickenPrice))
 		return
 	}
 
