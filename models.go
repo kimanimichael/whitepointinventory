@@ -39,6 +39,15 @@ type Farmer struct {
 	CashBalance    int32     `json:"cash_balance"`
 }
 
+type User struct {
+	ID        uuid.UUID `json:"ID"`
+	CreatedAt time.Time `json:"CreatedAt"`
+	UpdatedAt time.Time `json:"UpdatedAt"`
+	Name      string    `json:"Name"`
+	ApiKey    string    `json:"ApiKey"`
+	Email     string    `json:"Email"`
+}
+
 func databasePurchaseToPurchase(dbPurchase database.Purchase) Purchase {
 	return Purchase{
 		ID:              dbPurchase.ID,
@@ -96,4 +105,23 @@ func databaseFarmersToFarmers(dbFarmers []database.Farmer) []Farmer {
 		farmers = append(farmers, databaseFarmerToFarmer(dbFarmer))
 	}
 	return farmers
+}
+
+func databaseUserToUser(dbUser database.User) User {
+	return User{
+		ID:        dbUser.ID,
+		CreatedAt: dbUser.CreatedAt,
+		UpdatedAt: dbUser.UpdatedAt,
+		Name:      dbUser.Name,
+		ApiKey:    dbUser.ApiKey,
+		Email:     dbUser.Email,
+	}
+}
+
+func databaseUsersToUsers(dbUsers []database.User) []User {
+	var users []User
+	for _, dbUser := range dbUsers {
+		users = append(users, databaseUserToUser(dbUser))
+	}
+	return users
 }
