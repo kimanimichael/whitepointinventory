@@ -12,6 +12,18 @@ import (
 	"github.com/mike-kimani/whitepointinventory/internal/database"
 )
 
+// MinChickenNumber prevents zero value chicken number entries
+const MinChickenNumber = 1
+
+// MaxChickenNumber prevents entry errors e.g. 1000 instead of 100
+const MaxChickenNumber = 999
+
+// MinChickenPrice prevents entry errors e.g. swapping of chicken number and price
+const MinChickenPrice = 100
+
+// MaxChickenPrice prevents entry errors e.g. 4500 instead of 450 for price
+const MaxChickenPrice = 1000
+
 func (apiCfg *apiConfig) handerCreatePurchases(w http.ResponseWriter, r *http.Request, user database.User) {
 	type parameters struct {
 		Chicken    int32  `json:"chicken_no"`
@@ -28,6 +40,19 @@ func (apiCfg *apiConfig) handerCreatePurchases(w http.ResponseWriter, r *http.Re
 	err := decode.Decode(&params)
 	if err != nil {
 		respondWithError(w, 400, fmt.Sprintf("Error decoding json: %v", err))
+		return
+	}
+	if params.FarmerName == "" {
+		respondWithError(w, 400, "Farmer name is required")
+		return
+	}
+	if params.Chicken < MinChickenNumber || params.Chicken > MaxChickenNumber {
+		respondWithError(w, 400, fmt.Sprintf("Chicken number must be within %d and %d", MinChickenNumber, MaxChickenNumber))
+		return
+	}
+
+	if params.Price < MinChickenPrice || params.Price > MaxChickenPrice {
+		respondWithError(w, 400, fmt.Sprintf("Chicken price must be within %d and %d", MinChickenPrice, MaxChickenPrice))
 		return
 	}
 	farmer, err := apiCfg.DB.GetFarmerByName(r.Context(), params.FarmerName)
