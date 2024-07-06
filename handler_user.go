@@ -90,15 +90,19 @@ func (apiCfg *apiConfig) handlerUserLogin(w http.ResponseWriter, r *http.Request
 		respondWithError(w, 400, fmt.Sprintf("Auth error: %v", err))
 		return
 	}
-
-	user, err := apiCfg.DB.GetUserByPasswordAndEmail(r.Context(), database.GetUserByPasswordAndEmailParams{
-		Password: password,
-		Email:    email,
-	})
+	user, err := apiCfg.DB.GetUserByEmail(r.Context(), email)
 	if err != nil {
-		respondWithError(w, 404, fmt.Sprintf("User not found: %v", err))
+		respondWithError(w, 404, fmt.Sprintf("User does not exist: %v", err))
 		return
 	}
+	userPasswordBytes := []byte(user.Password)
+
+	err = bcrypt.CompareHashAndPassword(userPasswordBytes, []byte(password))
+	if err != nil {
+		respondWithError(w, 401, "Wrong password")
+		return
+	}
+
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
 		Issuer:    user.ID.String(),
 		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
