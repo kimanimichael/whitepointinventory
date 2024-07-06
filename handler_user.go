@@ -80,7 +80,7 @@ func (apiCfg *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Reques
 		respondWithError(w, 400, fmt.Sprintf("Couldn't create user: %v", err))
 		return
 	}
-	respondWithJSON(w, 201, user)
+	respondWithJSON(w, 201, databaseUserToUser(user))
 }
 
 func (apiCfg *apiConfig) handlerUserLogin(w http.ResponseWriter, r *http.Request) {
@@ -119,7 +119,7 @@ func (apiCfg *apiConfig) handlerUserLogin(w http.ResponseWriter, r *http.Request
 		HttpOnly: true,
 	}
 	http.SetCookie(w, &cookie)
-	respondWithJSON(w, 200, user)
+	respondWithJSON(w, 200, databaseUserToUser(user))
 }
 
 func (apiCfg *apiConfig) handlerGetUserFromCookie(w http.ResponseWriter, r *http.Request) {
@@ -142,7 +142,7 @@ func (apiCfg *apiConfig) handlerGetUserFromCookie(w http.ResponseWriter, r *http
 	if err != nil {
 		respondWithError(w, 404, fmt.Sprintf("User not found: %v", err))
 	}
-	respondWithJSON(w, 200, user)
+	respondWithJSON(w, 200, databaseUserToUser(user))
 }
 
 func (apiCfg *apiConfig) handlerUserLogout(w http.ResponseWriter, r *http.Request) {
@@ -161,5 +161,5 @@ func (apiCfg *apiConfig) handlerGetUsers(w http.ResponseWriter, r *http.Request)
 		respondWithError(w, 500, fmt.Sprintf("Couldn't get users: %v", err))
 		return
 	}
-	respondWithJSON(w, 200, users)
+	respondWithJSON(w, 200, databaseUsersToUsers(users))
 }
