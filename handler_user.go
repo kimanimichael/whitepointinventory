@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/mike-kimani/whitepointinventory/auth"
+	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"strings"
 	"time"
@@ -57,12 +58,21 @@ func (apiCfg *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(params.Password), 14)
+	if err != nil {
+		respondWithError(w, 500, fmt.Sprintf("Error hashing password: %v", err))
+		return
+	}
+
+	hashedPasswordString := string(hashedPassword)
+	fmt.Println(hashedPasswordString)
+
 	user, err := apiCfg.DB.CreateUser(r.Context(), database.CreateUserParams{
 		ID:        uuid.New(),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 		Name:      params.Name,
-		Password:  params.Password,
+		Password:  hashedPasswordString,
 		Email:     params.Email,
 	})
 
