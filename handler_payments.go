@@ -28,7 +28,7 @@ func (apiCfg *apiConfig) handlerCreatePayment(w http.ResponseWriter, r *http.Req
 
 	cash_balance := sql.NullInt32{}
 
-	chicken_balance := sql.NullInt32{}
+	chicken_balance := sql.NullFloat64{}
 
 	decode := json.NewDecoder(r.Body)
 
@@ -73,7 +73,7 @@ func (apiCfg *apiConfig) handlerCreatePayment(w http.ResponseWriter, r *http.Req
 	cash_balance.Int32 = params.Cash
 	cash_balance.Valid = true
 	// TODO: Handle operations that result in floats
-	chicken_balance.Int32 = params.Cash / params.PricePerChicken
+	chicken_balance.Float64 = float64(params.Cash / params.PricePerChicken)
 	chicken_balance.Valid = true
 
 	err = apiCfg.DB.DecreaseCashOwed(r.Context(), database.DecreaseCashOwedParams{
@@ -165,7 +165,7 @@ func (apiCfg *apiConfig) handlerDeletePayment(w http.ResponseWriter, r *http.Req
 	}
 
 	cash_balance := sql.NullInt32{}
-	chicken_owed := sql.NullInt32{}
+	chicken_owed := sql.NullFloat64{}
 
 	payment, err := apiCfg.DB.GetPaymentByID(r.Context(), paymentID)
 	if err != nil {
@@ -175,7 +175,7 @@ func (apiCfg *apiConfig) handlerDeletePayment(w http.ResponseWriter, r *http.Req
 	cash_balance.Int32 = payment.CashPaid
 	cash_balance.Valid = true
 	// TODO: Handle operations that result in floats
-	chicken_owed.Int32 = payment.CashPaid / payment.PricePerChickenPaid
+	chicken_owed.Float64 = float64(payment.CashPaid / payment.PricePerChickenPaid)
 	chicken_owed.Valid = true
 
 	err = apiCfg.DB.IncreaseCashOwed(r.Context(), database.IncreaseCashOwedParams{
