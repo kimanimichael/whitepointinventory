@@ -24,7 +24,7 @@ type CreateFarmerParams struct {
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 	Name           string
-	ChickenBalance sql.NullInt32
+	ChickenBalance sql.NullFloat64
 	CashBalance    sql.NullInt32
 }
 
@@ -72,7 +72,7 @@ WHERE farmers.id = $2
 `
 
 type DecreaseChickenOwedParams struct {
-	ChickenBalance sql.NullInt32
+	ChickenBalance sql.NullFloat64
 	ID             uuid.UUID
 }
 
@@ -183,7 +183,7 @@ WHERE farmers.id = $2
 `
 
 type IncreaseChickenOwedParams struct {
-	ChickenBalance sql.NullInt32
+	ChickenBalance sql.NullFloat64
 	ID             uuid.UUID
 }
 

@@ -14,9 +14,9 @@ import (
 
 func (apiCfg *apiConfig) handlerCreateFarmer(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
-		Name           string `json:"name"`
-		ChickenBalance int32  `json:"chicken_balance"`
-		CashBalance    int32  `json:"cash_balance"`
+		Name           string  `json:"name"`
+		ChickenBalance float64 `json:"chicken_balance"`
+		CashBalance    int32   `json:"cash_balance"`
 	}
 
 	params := parameters{}
@@ -28,10 +28,10 @@ func (apiCfg *apiConfig) handlerCreateFarmer(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	chickenBalance := sql.NullInt32{}
+	chickenBalance := sql.NullFloat64{}
 
 	if params.ChickenBalance != 0 {
-		chickenBalance.Int32 = params.ChickenBalance
+		chickenBalance.Float64 = params.ChickenBalance
 		chickenBalance.Valid = true
 	}
 
