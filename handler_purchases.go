@@ -31,7 +31,7 @@ func (apiCfg *apiConfig) handerCreatePurchases(w http.ResponseWriter, r *http.Re
 		FarmerName string `json:"farmer_name"`
 	}
 
-	chicken_bought := sql.NullInt32{}
+	chicken_bought := sql.NullFloat64{}
 	cash_balance := sql.NullInt32{}
 
 	params := parameters{}
@@ -76,7 +76,7 @@ func (apiCfg *apiConfig) handerCreatePurchases(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	chicken_bought.Int32 = params.Chicken
+	chicken_bought.Float64 = float64(params.Chicken)
 	chicken_bought.Valid = true
 
 	cash_balance.Int32 = params.Chicken * params.Price
@@ -179,8 +179,8 @@ func (apiCfg *apiConfig) handlerDeletePurchase(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	chicken_balance := sql.NullInt32{}
-	chicken_balance.Int32 = purchase.Chicken
+	chicken_balance := sql.NullFloat64{}
+	chicken_balance.Float64 = float64(purchase.Chicken)
 	chicken_balance.Valid = true
 
 	err = apiCfg.DB.DecreaseChickenOwed(r.Context(), database.DecreaseChickenOwedParams{

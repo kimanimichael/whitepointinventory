@@ -73,7 +73,7 @@ func (apiCfg *apiConfig) handlerCreatePayment(w http.ResponseWriter, r *http.Req
 	cash_balance.Int32 = params.Cash
 	cash_balance.Valid = true
 	// TODO: Handle operations that result in floats
-	chicken_balance.Float64 = float64(params.Cash / params.PricePerChicken)
+	chicken_balance.Float64 = float64(params.Cash) / float64(params.PricePerChicken)
 	chicken_balance.Valid = true
 
 	err = apiCfg.DB.DecreaseCashOwed(r.Context(), database.DecreaseCashOwedParams{
