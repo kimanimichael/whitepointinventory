@@ -16,7 +16,7 @@ type Farmer struct {
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 	Name           string
-	ChickenBalance sql.NullInt32
+	ChickenBalance sql.NullFloat64
 	CashBalance    sql.NullInt32
 }
 
