@@ -39,7 +39,7 @@ type Farmer struct {
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
 	Name           string    `json:"name"`
-	ChickenBalance int32     `json:"chicken_balance"`
+	ChickenBalance float64   `json:"chicken_balance"`
 	CashBalance    int32     `json:"cash_balance"`
 }
 
@@ -98,7 +98,7 @@ func databaseFarmerToFarmer(dbFarmer database.Farmer) Farmer {
 		CreatedAt:      dbFarmer.CreatedAt,
 		UpdatedAt:      dbFarmer.UpdatedAt,
 		Name:           dbFarmer.Name,
-		ChickenBalance: dbFarmer.ChickenBalance.Int32,
+		ChickenBalance: dbFarmer.ChickenBalance.Float64,
 		CashBalance:    dbFarmer.CashBalance.Int32,
 	}
 }
