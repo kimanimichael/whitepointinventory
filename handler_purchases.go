@@ -137,7 +137,7 @@ func (apiCfg *apiConfig) handlerGetPurchases(w http.ResponseWriter, r *http.Requ
 			return
 		}
 		purchaseWithName.FarmerName = farmer.Name
-		purchaseWithName.FarmerChickenBalance = farmer.ChickenBalance.Int32
+		purchaseWithName.FarmerChickenBalance = farmer.ChickenBalance.Float64
 		purchaseWithName.FarmerCashBalance = farmer.CashBalance.Int32
 
 		purchasesToPublish = append(purchasesToPublish, purchaseWithName)

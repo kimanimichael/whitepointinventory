@@ -16,7 +16,7 @@ type Purchase struct {
 	FarmerID             uuid.UUID `json:"farmer_id"`
 	UserName             string    `json:"user_name"`
 	FarmerName           string    `json:"farmer_name"`
-	FarmerChickenBalance int32     `json:"chicken_balance"`
+	FarmerChickenBalance float64   `json:"chicken_balance"`
 	FarmerCashBalance    int32     `json:"cash_balance"`
 }
 
@@ -30,7 +30,7 @@ type Payment struct {
 	FarmerID             uuid.UUID `json:"farmer_id"`
 	UserName             string    `json:"user_name"`
 	FarmerName           string    `json:"farmer_name"`
-	FarmerChickenBalance int32     `json:"chicken_balance"`
+	FarmerChickenBalance float64   `json:"chicken_balance"`
 	FarmerCashBalance    int32     `json:"cash_balance"`
 }
 
