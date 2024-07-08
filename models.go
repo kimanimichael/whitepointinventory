@@ -7,27 +7,31 @@ import (
 )
 
 type Purchase struct {
-	ID              uuid.UUID `json:"id"`
-	CreatedAt       time.Time `json:"created_at"`
-	UpdatedAt       time.Time `json:"updated_at"`
-	Chicken         int32     `json:"chicken"`
-	PricePerChicken int32     `json:"price_per_chicken"`
-	UserID          uuid.UUID `json:"user_id"`
-	FarmerID        uuid.UUID `json:"farmer_id"`
-	UserName        string    `json:"user_name"`
-	FarmerName      string    `json:"farmer_name"`
+	ID                   uuid.UUID `json:"id"`
+	CreatedAt            time.Time `json:"created_at"`
+	UpdatedAt            time.Time `json:"updated_at"`
+	Chicken              int32     `json:"chicken"`
+	PricePerChicken      int32     `json:"price_per_chicken"`
+	UserID               uuid.UUID `json:"user_id"`
+	FarmerID             uuid.UUID `json:"farmer_id"`
+	UserName             string    `json:"user_name"`
+	FarmerName           string    `json:"farmer_name"`
+	FarmerChickenBalance int32     `json:"chicken_balance"`
+	FarmerCashBalance    int32     `json:"cash_balance"`
 }
 
 type Payment struct {
-	ID                  uuid.UUID `json:"id"`
-	CreatedAt           time.Time `json:"created_at"`
-	UpdatedAt           time.Time `json:"updated_at"`
-	CashPaid            int32     `json:"cash_paid"`
-	PricePerChickenPaid int32     `json:"price_per_chicken_paid"`
-	UserID              uuid.UUID `json:"user_id"`
-	FarmerID            uuid.UUID `json:"farmer_id"`
-	UserName            string    `json:"user_name"`
-	FarmerName          string    `json:"farmer_name"`
+	ID                   uuid.UUID `json:"id"`
+	CreatedAt            time.Time `json:"created_at"`
+	UpdatedAt            time.Time `json:"updated_at"`
+	CashPaid             int32     `json:"cash_paid"`
+	PricePerChickenPaid  int32     `json:"price_per_chicken_paid"`
+	UserID               uuid.UUID `json:"user_id"`
+	FarmerID             uuid.UUID `json:"farmer_id"`
+	UserName             string    `json:"user_name"`
+	FarmerName           string    `json:"farmer_name"`
+	FarmerChickenBalance int32     `json:"chicken_balance"`
+	FarmerCashBalance    int32     `json:"cash_balance"`
 }
 
 type Farmer struct {
