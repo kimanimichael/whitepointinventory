@@ -175,7 +175,7 @@ func (apiCfg *apiConfig) handlerDeletePayment(w http.ResponseWriter, r *http.Req
 	cash_balance.Int32 = payment.CashPaid
 	cash_balance.Valid = true
 	// TODO: Handle operations that result in floats
-	chicken_owed.Float64 = float64(payment.CashPaid / payment.PricePerChickenPaid)
+	chicken_owed.Float64 = float64(payment.CashPaid) / float64(payment.PricePerChickenPaid)
 	chicken_owed.Valid = true
 
 	err = apiCfg.DB.IncreaseCashOwed(r.Context(), database.IncreaseCashOwedParams{
