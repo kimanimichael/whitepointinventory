@@ -127,6 +127,8 @@ func (apiCfg *apiConfig) handlerGetPayments(w http.ResponseWriter, r *http.Reque
 		}
 		customPayment.UserName = user.Name
 		customPayment.FarmerName = farmer.Name
+		customPayment.FarmerChickenBalance = farmer.ChickenBalance.Int32
+		customPayment.FarmerCashBalance = farmer.CashBalance.Int32
 		paymentResponse = append(paymentResponse, customPayment)
 	}
 
