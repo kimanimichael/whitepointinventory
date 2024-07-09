@@ -141,6 +141,7 @@ func (apiCfg *apiConfig) handlerGetUserFromCookie(w http.ResponseWriter, r *http
 	user, err := apiCfg.DB.GetUserByID(r.Context(), userID)
 	if err != nil {
 		respondWithError(w, 404, fmt.Sprintf("User not found: %v", err))
+		return
 	}
 	respondWithJSON(w, 200, databaseUserToUser(user))
 }
