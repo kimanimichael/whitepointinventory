@@ -1,10 +1,10 @@
 services:
   service:
-#    build:
-#      #Go back one directory
-#      context: ..
-#      dockerfile: docker/Dockerfile
-    image: michaelkimani/whitepointinventoryservice:latest
+    build:
+      #Go back one directory
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: whitepointinventoryservice
     container_name: whitepointinventoryservice-container
     #Exposed api ports
     ports:
@@ -31,11 +31,11 @@ services:
       - postgres-data:/var/lib/postgresql/data
 
   migrate:
-    image: michaelkimani/whitepointinventorymigrations
-#    build:
-#      #Go back one directory
-#      context: ..
-#      dockerfile: docker/Dockerfile.migrate
+    image: whitepointinventorymigrations
+    build:
+      #Go back one directory
+      context: ..
+      dockerfile: docker/Dockerfile.migrate
     container_name: whitepointinventorymigrations-container
     command: ["./run_migrations.sh"]
     depends_on:
