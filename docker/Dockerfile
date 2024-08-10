@@ -10,7 +10,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o whitepointinventory
+RUN go build -o whitepointinventory ./cmd/whitepointinventory
 
 FROM alpine:latest
 
