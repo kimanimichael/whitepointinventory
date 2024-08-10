@@ -1,10 +1,14 @@
-package main
+package models
 
 import (
 	"github.com/google/uuid"
 	"github.com/mike-kimani/whitepointinventory/internal/database"
 	"time"
 )
+
+type ApiConfig struct {
+	DB *database.Queries
+}
 
 type Purchase struct {
 	ID                   uuid.UUID `json:"id"`
@@ -52,7 +56,7 @@ type User struct {
 	Email     string    `json:"Email"`
 }
 
-func databasePurchaseToPurchase(dbPurchase database.Purchase) Purchase {
+func DatabasePurchaseToPurchase(dbPurchase database.Purchase) Purchase {
 	return Purchase{
 		ID:              dbPurchase.ID,
 		CreatedAt:       dbPurchase.CreatedAt,
@@ -64,15 +68,15 @@ func databasePurchaseToPurchase(dbPurchase database.Purchase) Purchase {
 	}
 }
 
-func databasePurchasesToPurchases(dbPurchases []database.Purchase) []Purchase {
+func DatabasePurchasesToPurchases(dbPurchases []database.Purchase) []Purchase {
 	purchases := []Purchase{}
 	for _, dbPurchase := range dbPurchases {
-		purchases = append(purchases, databasePurchaseToPurchase(dbPurchase))
+		purchases = append(purchases, DatabasePurchaseToPurchase(dbPurchase))
 	}
 	return purchases
 }
 
-func databasePaymentToPayment(dbPayment database.Payment) Payment {
+func DatabasePaymentToPayment(dbPayment database.Payment) Payment {
 	return Payment{
 		ID:                  dbPayment.ID,
 		CreatedAt:           dbPayment.CreatedAt,
@@ -84,15 +88,15 @@ func databasePaymentToPayment(dbPayment database.Payment) Payment {
 	}
 }
 
-func databasePaymentsToPayments(dbPayments []database.Payment) []Payment {
+func DatabasePaymentsToPayments(dbPayments []database.Payment) []Payment {
 	payments := []Payment{}
 	for _, dbPayment := range dbPayments {
-		payments = append(payments, databasePaymentToPayment(dbPayment))
+		payments = append(payments, DatabasePaymentToPayment(dbPayment))
 	}
 	return payments
 }
 
-func databaseFarmerToFarmer(dbFarmer database.Farmer) Farmer {
+func DatabaseFarmerToFarmer(dbFarmer database.Farmer) Farmer {
 	return Farmer{
 		ID:             dbFarmer.ID,
 		CreatedAt:      dbFarmer.CreatedAt,
@@ -103,15 +107,15 @@ func databaseFarmerToFarmer(dbFarmer database.Farmer) Farmer {
 	}
 }
 
-func databaseFarmersToFarmers(dbFarmers []database.Farmer) []Farmer {
+func DatabaseFarmersToFarmers(dbFarmers []database.Farmer) []Farmer {
 	farmers := []Farmer{}
 	for _, dbFarmer := range dbFarmers {
-		farmers = append(farmers, databaseFarmerToFarmer(dbFarmer))
+		farmers = append(farmers, DatabaseFarmerToFarmer(dbFarmer))
 	}
 	return farmers
 }
 
-func databaseUserToUser(dbUser database.User) User {
+func DatabaseUserToUser(dbUser database.User) User {
 	return User{
 		ID:        dbUser.ID,
 		CreatedAt: dbUser.CreatedAt,
@@ -122,10 +126,10 @@ func databaseUserToUser(dbUser database.User) User {
 	}
 }
 
-func databaseUsersToUsers(dbUsers []database.User) []User {
+func DatabaseUsersToUsers(dbUsers []database.User) []User {
 	var users []User
 	for _, dbUser := range dbUsers {
-		users = append(users, databaseUserToUser(dbUser))
+		users = append(users, DatabaseUserToUser(dbUser))
 	}
 	return users
 }
