@@ -1,9 +1,11 @@
-package main
+package farmers
 
 import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"github.com/mike-kimani/whitepointinventory/internal/models"
+	"github.com/mike-kimani/whitepointinventory/pkg/jsonresponses"
 	"net/http"
 	"time"
 
@@ -12,7 +14,11 @@ import (
 	"github.com/mike-kimani/whitepointinventory/internal/database"
 )
 
-func (apiCfg *apiConfig) handlerCreateFarmer(w http.ResponseWriter, r *http.Request) {
+type ApiConfig struct {
+	DB *database.Queries
+}
+
+func (apiCfg *ApiConfig) HandlerCreateFarmer(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
 		Name           string  `json:"name"`
 		ChickenBalance float64 `json:"chicken_balance"`
@@ -24,7 +30,7 @@ func (apiCfg *apiConfig) handlerCreateFarmer(w http.ResponseWriter, r *http.Requ
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&params)
 	if err != nil {
-		respondWithError(w, 400, fmt.Sprintf("Couldn't parse json %v", err))
+		jsonresponses.RespondWithError(w, 400, fmt.Sprintf("Couldn't parse jsonresponses %v", err))
 		return
 	}
 
@@ -51,14 +57,14 @@ func (apiCfg *apiConfig) handlerCreateFarmer(w http.ResponseWriter, r *http.Requ
 		CashBalance:    cashBalance,
 	})
 	if err != nil {
-		respondWithError(w, 400, fmt.Sprintf("Couldn't create farmer: %v", err))
+		jsonresponses.RespondWithError(w, 400, fmt.Sprintf("Couldn't create farmer: %v", err))
 		return
 	}
 
-	respondWithJSON(w, 200, farmer)
+	jsonresponses.RespondWithJSON(w, 200, farmer)
 }
 
-func (apiCfg *apiConfig) handlerGetFarmerByName(w http.ResponseWriter, r *http.Request) {
+func (apiCfg *ApiConfig) HandlerGetFarmerByName(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
 		Name string `json:"name"`
 	}
@@ -69,40 +75,40 @@ func (apiCfg *apiConfig) handlerGetFarmerByName(w http.ResponseWriter, r *http.R
 
 	err := decoder.Decode(&params)
 	if err != nil {
-		respondWithError(w, 400, fmt.Sprintf("Couldn't parse json: %v", err))
+		jsonresponses.RespondWithError(w, 400, fmt.Sprintf("Couldn't parse jsonresponses: %v", err))
 		return
 	}
 
 	farmer, err := apiCfg.DB.GetFarmerByName(r.Context(), params.Name)
 	if err != nil {
-		respondWithError(w, 400, fmt.Sprintf("Couldn't get farmer: %v", err))
+		jsonresponses.RespondWithError(w, 400, fmt.Sprintf("Couldn't get farmer: %v", err))
 		return
 	}
 
-	respondWithJSON(w, 200, farmer)
+	jsonresponses.RespondWithJSON(w, 200, farmer)
 }
 
-func (apiCfg *apiConfig) handlerDeleteFarmer(w http.ResponseWriter, r *http.Request) {
+func (apiCfg *ApiConfig) HandlerDeleteFarmer(w http.ResponseWriter, r *http.Request) {
 
-	farmerIDstr := chi.URLParam(r, "farmer_id")
-	farmerID, err := uuid.Parse(farmerIDstr)
+	farmerIDStr := chi.URLParam(r, "farmer_id")
+	farmerID, err := uuid.Parse(farmerIDStr)
 	if err != nil {
-		respondWithError(w, 400, fmt.Sprintf("Couldn't parse UUID for deletion: %v", err))
+		jsonresponses.RespondWithError(w, 400, fmt.Sprintf("Couldn't parse UUID for deletion: %v", err))
 		return
 	}
 
 	err = apiCfg.DB.DeleteFarmers(r.Context(), farmerID)
 	if err != nil {
-		respondWithError(w, 400, fmt.Sprintf("Couldn't delete farmer: %v", err))
+		jsonresponses.RespondWithError(w, 400, fmt.Sprintf("Couldn't delete farmer: %v", err))
 		return
 	}
-	respondWithJSON(w, 200, struct{}{})
+	jsonresponses.RespondWithJSON(w, 200, struct{}{})
 }
 
-func (apiCfg *apiConfig) handlerGetFarmers(w http.ResponseWriter, r *http.Request) {
+func (apiCfg *ApiConfig) HandlerGetFarmers(w http.ResponseWriter, r *http.Request) {
 	farmers, err := apiCfg.DB.GetFarmers(r.Context())
 	if err != nil {
-		respondWithError(w, 404, fmt.Sprintf("Couldn't get farmers: %v", err))
+		jsonresponses.RespondWithError(w, 404, fmt.Sprintf("Couldn't get farmers: %v", err))
 	}
-	respondWithJSON(w, 200, databaseFarmersToFarmers(farmers))
+	jsonresponses.RespondWithJSON(w, 200, models.DatabaseFarmersToFarmers(farmers))
 }
