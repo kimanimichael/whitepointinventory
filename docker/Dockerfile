@@ -16,8 +16,6 @@ FROM scratch
 
 WORKDIR /root/
 
-COPY ../.env .
-
 COPY --from=build /src/go/github.com/mike-kimani/whitepointinventory/whitepointinventory .
 
 EXPOSE 8080
