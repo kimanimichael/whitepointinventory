@@ -12,7 +12,7 @@ COPY . .
 
 RUN go build -o whitepointinventory ./cmd
 
-FROM alpine:latest
+FROM scratch
 
 WORKDIR /root/
 
