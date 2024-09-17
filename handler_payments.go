@@ -18,6 +18,8 @@ const MinCashPaid = 1000
 // MaxCashPaid prevents entry errors e.g. 400000 entry instead of 40000
 const MaxCashPaid = 100000
 
+const IdenticalTransactionInterval = 2 * time.Minute
+
 func (apiCfg *apiConfig) handlerCreatePayment(w http.ResponseWriter, r *http.Request, user database.User) {
 	type parameters struct {
 		Cash            int32  `json:"cash_paid"`
@@ -54,6 +56,37 @@ func (apiCfg *apiConfig) handlerCreatePayment(w http.ResponseWriter, r *http.Req
 	if err != nil {
 		respondWithError(w, 404, fmt.Sprintf("Couldn't find farmer by name: %v", err))
 		return
+	}
+
+	mostRecentPayment, err := apiCfg.DB.GetMostRecentPayment(r.Context())
+	if err != nil {
+		respondWithError(w, 404, fmt.Sprintf("Couldn't find most recent payment: %v", err))
+	}
+
+	currentTime := time.Now()
+	//fix stored time to EAT
+	correctedRecentPaymentTime := time.Date(
+		mostRecentPayment.CreatedAt.Year(),
+		mostRecentPayment.CreatedAt.Month(),
+		mostRecentPayment.CreatedAt.Day(),
+		mostRecentPayment.CreatedAt.Hour(),
+		mostRecentPayment.CreatedAt.Minute(),
+		mostRecentPayment.CreatedAt.Second(),
+		mostRecentPayment.CreatedAt.Nanosecond(),
+		time.FixedZone("EAT", 3*60*60),
+	)
+	durationSinceLastPayment := currentTime.Sub(correctedRecentPaymentTime)
+
+	if durationSinceLastPayment < IdenticalTransactionInterval {
+		fmt.Printf("Duration Since Last Payment less than %d minutes\n", IdenticalTransactionInterval/time.Minute)
+		if mostRecentPayment.FarmerID == farmer.ID {
+			if mostRecentPayment.CashPaid == params.Cash {
+				if mostRecentPayment.PricePerChickenPaid == params.PricePerChicken {
+					respondWithError(w, 404, fmt.Sprintf("Identical transaction made for Farmer %s. Wait for %d seconds", farmer.Name, int(IdenticalTransactionInterval.Seconds()-durationSinceLastPayment.Seconds())))
+					return
+				}
+			}
+		}
 	}
 
 	payment, err := apiCfg.DB.CreatePayment(r.Context(), database.CreatePaymentParams{
