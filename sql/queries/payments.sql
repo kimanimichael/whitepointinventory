@@ -12,3 +12,8 @@ WHERE id = $1;
 
 -- name: DeletePayments :exec
 DELETE FROM payments WHERE id = $1;
+
+-- name: GetMostRecentPayment :one
+SELECT * FROM payments
+ORDER BY created_at DESC
+LIMIT 1;
