@@ -77,11 +77,11 @@ func (apiCfg *apiConfig) handlerCreatePayment(w http.ResponseWriter, r *http.Req
 	)
 	durationSinceLastPayment := currentTime.Sub(correctedRecentPaymentTime)
 
-	if durationSinceLastPayment < IdenticalTransactionInterval {
-		fmt.Printf("Duration Since Last Payment less than %d minutes\n", IdenticalTransactionInterval/time.Minute)
-		if mostRecentPayment.FarmerID == farmer.ID {
-			if mostRecentPayment.CashPaid == params.Cash {
-				if mostRecentPayment.PricePerChickenPaid == params.PricePerChicken {
+	if mostRecentPayment.FarmerID == farmer.ID {
+		if mostRecentPayment.CashPaid == params.Cash {
+			if mostRecentPayment.PricePerChickenPaid == params.PricePerChicken {
+				if durationSinceLastPayment < IdenticalTransactionInterval {
+					fmt.Printf("Identical transactions in less than %ds attempted", int(IdenticalTransactionInterval.Seconds()))
 					respondWithError(w, 404, fmt.Sprintf("Identical transaction made for Farmer %s. Wait for %d seconds", farmer.Name, int(IdenticalTransactionInterval.Seconds()-durationSinceLastPayment.Seconds())))
 					return
 				}
