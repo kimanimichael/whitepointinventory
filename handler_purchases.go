@@ -76,10 +76,12 @@ func (apiCfg *apiConfig) handerCreatePurchases(w http.ResponseWriter, r *http.Re
 		time.FixedZone("EAT", 3*60*60),
 	)
 	durationSinceLastPayment := currentTime.Sub(correctedRecentPurchaseTime)
+
 	if mostRecentPurchase.FarmerID == farmer.ID {
 		if mostRecentPurchase.Chicken == params.Chicken {
 			if mostRecentPurchase.PricePerChicken == params.Price {
 				if durationSinceLastPayment < IdenticalTransactionInterval {
+					fmt.Printf("Identical transactions in less than %ds attempted", int(IdenticalTransactionInterval.Seconds()))
 					respondWithError(w, 404, fmt.Sprintf("Similar transaction for %s. Wait for %ds", farmer.Name, int(IdenticalTransactionInterval.Seconds()-durationSinceLastPayment.Seconds())))
 					return
 				}
