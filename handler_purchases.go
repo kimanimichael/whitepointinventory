@@ -60,6 +60,32 @@ func (apiCfg *apiConfig) handerCreatePurchases(w http.ResponseWriter, r *http.Re
 		respondWithError(w, 500, fmt.Sprintf("Error getting farmer: %v", err))
 		return
 	}
+	mostRecentPurchase, err := apiCfg.DB.GetMostRecentPurchase(r.Context())
+	if err != nil {
+		respondWithError(w, 500, fmt.Sprintf("Error getting most recent purchase: %v", err))
+	}
+	currentTime := time.Now()
+	correctedRecentPurchaseTime := time.Date(
+		mostRecentPurchase.CreatedAt.Year(),
+		mostRecentPurchase.CreatedAt.Month(),
+		mostRecentPurchase.CreatedAt.Day(),
+		mostRecentPurchase.CreatedAt.Hour(),
+		mostRecentPurchase.CreatedAt.Minute(),
+		mostRecentPurchase.CreatedAt.Second(),
+		mostRecentPurchase.CreatedAt.Nanosecond(),
+		time.FixedZone("EAT", 3*60*60),
+	)
+	durationSinceLastPayment := currentTime.Sub(correctedRecentPurchaseTime)
+	if mostRecentPurchase.FarmerID == farmer.ID {
+		if mostRecentPurchase.Chicken == params.Chicken {
+			if mostRecentPurchase.PricePerChicken == params.Price {
+				if durationSinceLastPayment < IdenticalTransactionInterval {
+					respondWithError(w, 404, fmt.Sprintf("Similar transaction for %s. Wait for %ds", farmer.Name, int(IdenticalTransactionInterval.Seconds()-durationSinceLastPayment.Seconds())))
+					return
+				}
+			}
+		}
+	}
 
 	purchase, err := apiCfg.DB.CreatePurchase(r.Context(), database.CreatePurchaseParams{
 		ID:              uuid.New(),
