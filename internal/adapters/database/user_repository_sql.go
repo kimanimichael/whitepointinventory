@@ -3,7 +3,7 @@ package sqlc
 import (
 	"context"
 	"github.com/google/uuid"
-	sqlcdatabase "github.com/mike-kimani/whitepointinventory/internal/adapters/db/sqlc/gensql"
+	"github.com/mike-kimani/whitepointinventory/internal/adapters/database/sqlc/gensql"
 	"github.com/mike-kimani/whitepointinventory/internal/domain"
 	"time"
 )
