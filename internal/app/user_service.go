@@ -36,13 +36,38 @@ func (s *userService) CreateUser(name, email, password string) (*domain.User, er
 }
 
 func (s *userService) GetUserByID(ID uuid.UUID) (*domain.User, error) {
-	return &domain.User{}, nil
+	user, err := s.repo.GetUserByID(ID)
+	if err != nil {
+		return nil, err
+	}
+	return &domain.User{
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+		Name:      user.Name,
+		Email:     user.Email,
+		APIKey:    user.APIKey,
+	}, nil
 }
 
 func (s *userService) GetUserByEmail(email string) (*domain.User, error) {
-	return &domain.User{}, nil
+	user, err := s.repo.GetUserByEmail(email)
+	if err != nil {
+		return nil, err
+	}
+	return &domain.User{
+		ID:        user.ID,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+		Name:      user.Name,
+		Email:     user.Email,
+		APIKey:    user.APIKey,
+	}, nil
 }
 
 func (s *userService) GetUsers() ([]domain.User, error) {
-	return []domain.User{}, nil
+	users, err := s.repo.GetUsers()
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
 }

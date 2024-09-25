@@ -37,3 +37,11 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 	httpresponses.RespondWithJson(w, http.StatusCreated, user)
 }
+
+func (h *UserHandler) GetUsers(w http.ResponseWriter, r *http.Request) {
+	users, err := h.service.GetUsers()
+	if err != nil {
+		httpresponses.RespondWithError(w, http.StatusInternalServerError, err.Error())
+	}
+	httpresponses.RespondWithJson(w, http.StatusOK, users)
+}
