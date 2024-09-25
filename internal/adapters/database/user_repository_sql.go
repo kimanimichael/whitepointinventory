@@ -5,6 +5,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/mike-kimani/whitepointinventory/internal/adapters/database/sqlc/gensql"
 	"github.com/mike-kimani/whitepointinventory/internal/domain"
+	"github.com/mike-kimani/whitepointinventory/internal/models"
 	"time"
 )
 
@@ -26,10 +27,14 @@ func (r *UserRepositorySql) CreateUser(name, email, password string) (*domain.Us
 	if err != nil {
 		return nil, err
 	}
+	modelUser := models.DatabaseUserToUser(user)
 	return &domain.User{
-		Name:     user.Name,
-		Email:    user.Email,
-		Password: user.Password,
+		ID:        modelUser.ID,
+		CreatedAt: modelUser.CreatedAt,
+		UpdatedAt: modelUser.UpdatedAt,
+		Name:      modelUser.Name,
+		Email:     modelUser.Email,
+		APIKey:    modelUser.ApiKey,
 	}, nil
 }
 
@@ -38,10 +43,14 @@ func (r *UserRepositorySql) GetUserByID(ID uuid.UUID) (*domain.User, error) {
 	if err != nil {
 		return nil, err
 	}
+	modelUser := models.DatabaseUserToUser(user)
 	return &domain.User{
-		Name:     user.Name,
-		Email:    user.Email,
-		Password: user.Password,
+		ID:        modelUser.ID,
+		CreatedAt: modelUser.CreatedAt,
+		UpdatedAt: modelUser.UpdatedAt,
+		Name:      modelUser.Name,
+		Email:     modelUser.Email,
+		APIKey:    modelUser.ApiKey,
 	}, nil
 }
 
@@ -50,10 +59,14 @@ func (r *UserRepositorySql) GetUserByEmail(email string) (*domain.User, error) {
 	if err != nil {
 		return nil, err
 	}
+	modelUser := models.DatabaseUserToUser(user)
 	return &domain.User{
-		Name:     user.Name,
-		Email:    user.Email,
-		Password: user.Password,
+		ID:        modelUser.ID,
+		CreatedAt: modelUser.CreatedAt,
+		UpdatedAt: modelUser.UpdatedAt,
+		Name:      modelUser.Name,
+		Email:     modelUser.Email,
+		APIKey:    modelUser.ApiKey,
 	}, nil
 }
 
@@ -65,10 +78,13 @@ func (r *UserRepositorySql) GetUsers() ([]domain.User, error) {
 
 	var userList []domain.User
 	for _, user := range users {
+		modelUser := models.DatabaseUserToUser(user)
 		userList = append(userList, domain.User{
-			Name:     user.Name,
-			Email:    user.Email,
-			Password: user.Password,
+			ID:        modelUser.ID,
+			CreatedAt: modelUser.CreatedAt,
+			UpdatedAt: modelUser.UpdatedAt,
+			Name:      modelUser.Name,
+			Email:     modelUser.Email,
 		})
 	}
 	return userList, nil

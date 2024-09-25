@@ -6,9 +6,12 @@ import (
 )
 
 type User struct {
-	Name     string
-	Email    string
-	Password string
+	ID        uuid.UUID
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Name      string
+	Email     string
+	APIKey    string
 }
 
 type Farmer struct {
