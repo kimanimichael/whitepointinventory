@@ -30,9 +30,8 @@ func (s *userService) CreateUser(name, email, password string) (*domain.User, er
 	}
 
 	return &domain.User{
-		Name:     user.Name,
-		Email:    user.Email,
-		Password: user.Password,
+		Name:  user.Name,
+		Email: user.Email,
 	}, nil
 }
 
