@@ -18,6 +18,10 @@ func NewUserHandler(service app.UserService) *UserHandler {
 	}
 }
 
+func (h *UserHandler) RegisterRoutes(router chi.Router) {
+	router.Post("/user", h.CreateUser)
+}
+
 func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	params := CreateUserRequest{}
 
@@ -32,8 +36,4 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	httpresponses.RespondWithJson(w, http.StatusCreated, user)
-}
-
-func (h *UserHandler) RegisterRoutes(router chi.Router) {
-	router.Post("/user", h.CreateUser)
 }
