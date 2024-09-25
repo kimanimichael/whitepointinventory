@@ -54,6 +54,7 @@ type User struct {
 	Name      string    `json:"Name"`
 	ApiKey    string    `json:"ApiKey"`
 	Email     string    `json:"Email"`
+	Password  string
 }
 
 func DatabasePurchaseToPurchase(dbPurchase sqlcdatabase.Purchase) Purchase {

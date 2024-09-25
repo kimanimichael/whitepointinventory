@@ -12,6 +12,7 @@ type User struct {
 	Name      string
 	Email     string
 	APIKey    string
+	Password  string
 }
 
 type Farmer struct {

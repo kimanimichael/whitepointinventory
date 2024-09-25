@@ -67,6 +67,7 @@ func (r *UserRepositorySql) GetUserByEmail(email string) (*domain.User, error) {
 		Name:      modelUser.Name,
 		Email:     modelUser.Email,
 		APIKey:    modelUser.ApiKey,
+		Password:  modelUser.Password,
 	}, nil
 }
 
