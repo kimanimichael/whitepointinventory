@@ -30,6 +30,7 @@ func (h *UserHandler) RegisterRoutes(router chi.Router) {
 	router.Post("/user", h.CreateUser)
 	router.Post("/login", h.UserLogin)
 	router.Get("/users", h.GetUserFromCookie)
+	router.Post("/logout", h.UserLogout)
 }
 
 func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
@@ -118,4 +119,14 @@ func (h *UserHandler) GetUserFromCookie(w http.ResponseWriter, r *http.Request) 
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Error getting user: %v", err))
 	}
 	httpresponses.RespondWithJson(w, http.StatusOK, user)
+}
+
+func (h *UserHandler) UserLogout(w http.ResponseWriter, r *http.Request) {
+	cookie := http.Cookie{
+		Name:     "jwt",
+		Value:    "",
+		Expires:  time.Now().Add(time.Hour * -1),
+		HttpOnly: true,
+	}
+	http.SetCookie(w, &cookie)
 }
