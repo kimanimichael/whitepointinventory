@@ -101,6 +101,7 @@ func (h *UserHandler) GetUserFromCookie(w http.ResponseWriter, r *http.Request) 
 	cookie, err := r.Cookie("jwt")
 	if err != nil {
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Error getting cookie: %v", err))
+		return
 	}
 	tokenString := cookie.Value
 	token, err := jwt.ParseWithClaims(tokenString, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
@@ -108,15 +109,18 @@ func (h *UserHandler) GetUserFromCookie(w http.ResponseWriter, r *http.Request) 
 	})
 	if err != nil {
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Error getting token: %v", err))
+		return
 	}
 	claims := token.Claims.(*jwt.StandardClaims)
 	userID, err := uuid.Parse(claims.Issuer)
 	if err != nil {
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Error parsing userID: %v", err))
+		return
 	}
 	user, err := h.service.GetUserByID(userID)
 	if err != nil {
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Error getting user: %v", err))
+		return
 	}
 	httpresponses.RespondWithJson(w, http.StatusOK, user)
 }
