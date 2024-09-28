@@ -11,3 +11,10 @@ type UserService interface {
 	GetUserByEmail(email string) (*domain.User, error)
 	GetUsers() ([]domain.User, error)
 }
+
+type FarmerService interface {
+	CreateFarmer(name string, chickenBalance int32, cashBalance int32) (*domain.Farmer, error)
+	GetFarmerByName(name string) (*domain.Farmer, error)
+	GetFarmers() ([]domain.Farmer, error)
+	DeleteFarmerByID(ID uuid.UUID) error
+}
