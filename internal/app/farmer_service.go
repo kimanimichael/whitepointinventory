@@ -15,7 +15,7 @@ func NewFarmerService(repo domain.FarmerRepository) FarmerService {
 	}
 }
 
-func (s *farmerService) CreateFarmer(name string, chickenBalance int32, cashBalance int32) (*domain.Farmer, error) {
+func (s *farmerService) CreateFarmer(name string, chickenBalance float64, cashBalance int32) (*domain.Farmer, error) {
 	farmer, err := s.repo.CreateFarmer(name, chickenBalance, cashBalance)
 	if err != nil {
 		return nil, err
