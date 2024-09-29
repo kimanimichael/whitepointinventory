@@ -2,26 +2,27 @@ package middleware
 
 import (
 	"fmt"
-	"github.com/mike-kimani/whitepointinventory/internal/database"
+	"github.com/mike-kimani/whitepointinventory/internal/app"
+	"github.com/mike-kimani/whitepointinventory/internal/domain"
 	"github.com/mike-kimani/whitepointinventory/pkg/auth"
 	"github.com/mike-kimani/whitepointinventory/pkg/jsonresponses"
 	"net/http"
 )
 
-type ApiConfig struct {
-	DB *database.Queries
+type userAuth struct {
+	service app.UserService
 }
 
-type authedHandler func(http.ResponseWriter, *http.Request, database.User)
+type authedHandler func(http.ResponseWriter, *http.Request, *domain.User)
 
-func (apiCfg *ApiConfig) MiddlewareAuth(handler authedHandler) http.HandlerFunc {
+func (a *userAuth) MiddlewareAuth(handler authedHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		APIKey, err := auth.GetAPIKey(r.Header)
 		if err != nil {
 			jsonresponses.RespondWithError(w, 400, fmt.Sprintf("Auth error: %v", err))
 			return
 		}
-		user, err := apiCfg.DB.GetUserByAPIKey(r.Context(), APIKey)
+		user, err := a.service.GetUserByAPIKey(APIKey)
 
 		if err != nil {
 			jsonresponses.RespondWithError(w, 400, fmt.Sprintf("Couldn't get user: %v", err))
