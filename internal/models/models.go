@@ -124,6 +124,7 @@ func DatabaseUserToUser(dbUser sqlcdatabase.User) User {
 		Name:      dbUser.Name,
 		ApiKey:    dbUser.ApiKey,
 		Email:     dbUser.Email,
+		Password:  dbUser.Password,
 	}
 }
 

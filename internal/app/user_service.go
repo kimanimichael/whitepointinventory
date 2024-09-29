@@ -61,6 +61,7 @@ func (s *userService) GetUserByEmail(email string) (*domain.User, error) {
 		Name:      user.Name,
 		Email:     user.Email,
 		APIKey:    user.APIKey,
+		Password:  user.Password,
 	}, nil
 }
 
