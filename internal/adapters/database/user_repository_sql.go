@@ -1,4 +1,4 @@
-package sqlc
+package database
 
 import (
 	"context"
