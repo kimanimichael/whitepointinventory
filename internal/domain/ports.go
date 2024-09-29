@@ -21,7 +21,7 @@ type Farmer struct {
 	UpdatedAt      time.Time
 	Name           string
 	PhoneNumber    string
-	ChickenBalance int32
+	ChickenBalance float64
 	CashBalance    int32
 }
 
