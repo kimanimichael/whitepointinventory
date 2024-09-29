@@ -22,6 +22,9 @@ func NewFarmerHandler(service app.FarmerService) *FarmerHandler {
 
 func (h *FarmerHandler) RegisterRoutes(router chi.Router) {
 	router.Post("/farmer", h.CreateFarmer)
+	router.Get("/farmer", h.GetFarmerByName)
+	router.Get("/farmers", h.GetFarmers)
+	router.Delete("/farmer", h.DeleteFarmerByID)
 }
 
 func (h *FarmerHandler) CreateFarmer(w http.ResponseWriter, r *http.Request) {
