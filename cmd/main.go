@@ -6,13 +6,10 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
-	"github.com/mike-kimani/whitepointinventory/internal/database"
-	"github.com/mike-kimani/whitepointinventory/internal/farmers"
-	"github.com/mike-kimani/whitepointinventory/internal/middleware"
-	"github.com/mike-kimani/whitepointinventory/internal/payments"
-	"github.com/mike-kimani/whitepointinventory/internal/purchases"
-	"github.com/mike-kimani/whitepointinventory/internal/users"
-	"github.com/mike-kimani/whitepointinventory/pkg/health"
+	"github.com/mike-kimani/whitepointinventory/internal/adapters/database"
+	sqlcdatabase "github.com/mike-kimani/whitepointinventory/internal/adapters/database/sqlc/gensql"
+	"github.com/mike-kimani/whitepointinventory/internal/api/httpapi"
+	"github.com/mike-kimani/whitepointinventory/internal/app"
 	"log"
 	"net/http"
 	"os"
@@ -44,9 +41,17 @@ func main() {
 	}
 	log.Println("Connected to database: ", dbURL)
 
-	db := database.New(conn)
+	db := sqlcdatabase.New(conn)
+	// Init repositories
+	userRepositorySQL := database.NewUserRepositorySQL(db)
+	farmerRepositorySQl := database.NewFarmerRepositorySQL(db)
+
+	//Init services
+	userService := app.NewUserService(userRepositorySQL)
+	farmerService := app.NewFarmerService(farmerRepositorySQl)
 
 	router := chi.NewRouter()
+
 	router.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -55,47 +60,53 @@ func main() {
 		AllowCredentials: true,
 	}))
 
-	usersApiCfg := users.ApiConfig{
-		DB: db,
-	}
+	//Init http handlers
+	userHandler := httpapi.NewUserHandler(userService)
+	userHandler.RegisterRoutes(router)
+	farmerHandler := httpapi.NewFarmerHandler(farmerService)
+	farmerHandler.RegisterRoutes(router)
 
-	purchasesApiCfg := purchases.ApiConfig{
-		DB: db,
-	}
+	//usersApiCfg := users.ApiConfig{
+	//	DB: db,
+	//}
 
-	farmersApiCfg := farmers.ApiConfig{
-		DB: db,
-	}
+	//purchasesApiCfg := purchases.ApiConfig{
+	//	DB: db,
+	//}
+	//
+	//farmersApiCfg := farmers.ApiConfig{
+	//	DB: db,
+	//}
+	//
+	//middlewareApiCfg := middleware.ApiConfig{
+	//	DB: db,
+	//}
+	//
+	//paymentsApiCfg := payments.ApiConfig{
+	//	DB: db,
+	//}
 
-	middlewareApiCfg := middleware.ApiConfig{
-		DB: db,
-	}
+	//v2Router := chi.NewRouter()
+	//v2Router.Get("/health", health.HandlerHealth)
+	//v2Router.Post("/users", usersApiCfg.HandlerCreateUser)
+	//v2Router.Get("/users", usersApiCfg.HandlerGetUserFromCookie)
+	//v2Router.Get("/user", usersApiCfg.HandlerGetUsers)
+	//v2Router.Post("/login", usersApiCfg.HandlerUserLogin)
+	//v2Router.Post("/logout", usersApiCfg.HandlerUserLogout)
+	//v2Router.Post("/farmers", farmersApiCfg.HandlerCreateFarmer)
+	//v2Router.Get("/farmers", farmersApiCfg.HandlerGetFarmerByName)
+	//v2Router.Get("/farmer", farmersApiCfg.HandlerGetFarmers)
+	//v2Router.Delete("/farmers/{farmer_id}", farmersApiCfg.HandlerDeleteFarmer)
+	//v2Router.Post("/purchases", middlewareApiCfg.MiddlewareAuth(purchasesApiCfg.HandlerCreatePurchases))
+	//v2Router.Get("/purchases", purchasesApiCfg.HandlerGetPurchases)
+	//v2Router.Get("/purchase", purchasesApiCfg.HandlerGetPurchaseByID)
+	//v2Router.Delete("/purchases/{purchase_id}", middlewareApiCfg.MiddlewareAuth(purchasesApiCfg.HandlerDeletePurchase))
+	//v2Router.Post("/payments", middlewareApiCfg.MiddlewareAuth(paymentsApiCfg.HandlerCreatePayment))
+	//v2Router.Get("/payment", paymentsApiCfg.HandlerGetPaymentByID)
+	//v2Router.Get("/payments", paymentsApiCfg.HandlerGetPayments)
+	//v2Router.Delete("/payments/{payment_id}", middlewareApiCfg.MiddlewareAuth(paymentsApiCfg.HandlerDeletePayment))
 
-	paymentsApiCfg := payments.ApiConfig{
-		DB: db,
-	}
-
-	v2Router := chi.NewRouter()
-	v2Router.Get("/health", health.HandlerHealth)
-	v2Router.Post("/users", usersApiCfg.HandlerCreateUser)
-	v2Router.Get("/users", usersApiCfg.HandlerGetUserFromCookie)
-	v2Router.Get("/user", usersApiCfg.HandlerGetUsers)
-	v2Router.Post("/login", usersApiCfg.HandlerUserLogin)
-	v2Router.Post("/logout", usersApiCfg.HandlerUserLogout)
-	v2Router.Post("/farmers", farmersApiCfg.HandlerCreateFarmer)
-	v2Router.Get("/farmers", farmersApiCfg.HandlerGetFarmerByName)
-	v2Router.Get("/farmer", farmersApiCfg.HandlerGetFarmers)
-	v2Router.Delete("/farmers/{farmer_id}", farmersApiCfg.HandlerDeleteFarmer)
-	v2Router.Post("/purchases", middlewareApiCfg.MiddlewareAuth(purchasesApiCfg.HandlerCreatePurchases))
-	v2Router.Get("/purchases", purchasesApiCfg.HandlerGetPurchases)
-	v2Router.Get("/purchase", purchasesApiCfg.HandlerGetPurchaseByID)
-	v2Router.Delete("/purchases/{purchase_id}", middlewareApiCfg.MiddlewareAuth(purchasesApiCfg.HandlerDeletePurchase))
-	v2Router.Post("/payments", middlewareApiCfg.MiddlewareAuth(paymentsApiCfg.HandlerCreatePayment))
-	v2Router.Get("/payment", paymentsApiCfg.HandlerGetPaymentByID)
-	v2Router.Get("/payments", paymentsApiCfg.HandlerGetPayments)
-	v2Router.Delete("/payments/{payment_id}", middlewareApiCfg.MiddlewareAuth(paymentsApiCfg.HandlerDeletePayment))
-
-	router.Mount("/v2", v2Router)
+	//router.Mount("/v2", v2Router)
 
 	srv := &http.Server{
 		Handler: router,
