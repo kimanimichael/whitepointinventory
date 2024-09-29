@@ -30,6 +30,7 @@ func (h *UserHandler) RegisterRoutes(router chi.Router) {
 	router.Post("/user", h.CreateUser)
 	router.Post("/login", h.UserLogin)
 	router.Get("/users", h.GetUserFromCookie)
+	router.Get("/user", h.GetUsers)
 	router.Post("/logout", h.UserLogout)
 }
 
