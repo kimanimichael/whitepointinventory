@@ -65,6 +65,22 @@ func (s *userService) GetUserByEmail(email string) (*domain.User, error) {
 	}, nil
 }
 
+func (s *userService) GetUserByAPIKey(key string) (*domain.User, error) {
+	user, err := s.repo.GetUserByAPIKey(key)
+	if err != nil {
+		return nil, err
+	}
+	return &domain.User{
+		ID:        user.ID,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+		Name:      user.Name,
+		Email:     user.Email,
+		APIKey:    user.APIKey,
+		Password:  user.Password,
+	}, nil
+}
+
 func (s *userService) GetUsers() ([]domain.User, error) {
 	users, err := s.repo.GetUsers()
 	if err != nil {

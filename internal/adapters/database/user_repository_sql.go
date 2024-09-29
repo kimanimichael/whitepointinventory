@@ -15,6 +15,12 @@ type UserRepositorySql struct {
 
 var _ domain.UserRepository = (*UserRepositorySql)(nil)
 
+func NewUserRepositorySQL(db *sqlcdatabase.Queries) *UserRepositorySql {
+	return &UserRepositorySql{
+		DB: db,
+	}
+}
+
 func (r *UserRepositorySql) CreateUser(name, email, password string) (*domain.User, error) {
 	user, err := r.DB.CreateUser(context.Background(), sqlcdatabase.CreateUserParams{
 		ID:        uuid.New(),
@@ -56,6 +62,23 @@ func (r *UserRepositorySql) GetUserByID(ID uuid.UUID) (*domain.User, error) {
 
 func (r *UserRepositorySql) GetUserByEmail(email string) (*domain.User, error) {
 	user, err := r.DB.GetUserByEmail(context.Background(), email)
+	if err != nil {
+		return nil, err
+	}
+	modelUser := models.DatabaseUserToUser(user)
+	return &domain.User{
+		ID:        modelUser.ID,
+		CreatedAt: modelUser.CreatedAt,
+		UpdatedAt: modelUser.UpdatedAt,
+		Name:      modelUser.Name,
+		Email:     modelUser.Email,
+		APIKey:    modelUser.ApiKey,
+		Password:  modelUser.Password,
+	}, nil
+}
+
+func (r *UserRepositorySql) GetUserByAPIKey(key string) (*domain.User, error) {
+	user, err := r.DB.GetUserByAPIKey(context.Background(), key)
 	if err != nil {
 		return nil, err
 	}

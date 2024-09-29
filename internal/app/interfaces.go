@@ -9,6 +9,7 @@ type UserService interface {
 	CreateUser(name, email, password string) (*domain.User, error)
 	GetUserByID(ID uuid.UUID) (*domain.User, error)
 	GetUserByEmail(email string) (*domain.User, error)
+	GetUserByAPIKey(APIKey string) (*domain.User, error)
 	GetUsers() ([]domain.User, error)
 }
 
