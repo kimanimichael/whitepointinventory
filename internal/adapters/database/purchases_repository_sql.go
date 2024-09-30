@@ -81,3 +81,66 @@ func (r *PurchasesRepositorySQL) CreatePurchase(chickenNo, chickenPrice int32, f
 		PricePerChicken: modelPurchase.PricePerChicken,
 	}, nil
 }
+
+func (r *PurchasesRepositorySQL) GetPurchaseByID(ID uuid.UUID) (*domain.Purchase, error) {
+	purchase, err := r.DB.GetPurchaseByID(context.Background(), ID)
+	if err != nil {
+		return nil, err
+	}
+	modelPurchase := models.DatabasePurchaseToPurchase(purchase)
+	return &domain.Purchase{
+		ID:              modelPurchase.ID,
+		CreatedAt:       modelPurchase.CreatedAt,
+		UpdatedAt:       modelPurchase.UpdatedAt,
+		FarmerID:        modelPurchase.FarmerID,
+		UserID:          modelPurchase.UserID,
+		Chicken:         modelPurchase.Chicken,
+		PricePerChicken: modelPurchase.PricePerChicken,
+	}, nil
+}
+
+func (r *PurchasesRepositorySQL) GetPurchases() ([]domain.Purchase, error) {
+	purchases, err := r.DB.GetPurchases(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	var purchasesWithNames []models.Purchase
+	var purchasesToReturn []models.Purchase
+	for _, purchase := range purchases {
+		purchasesWithNames = append(purchasesWithNames, models.DatabasePurchaseToPurchase(purchase))
+	}
+	for _, purchaseWithName := range purchasesWithNames {
+		user, err := r.DB.GetUserByID(context.Background(), purchaseWithName.UserID)
+		if err != nil {
+			return nil, err
+		}
+		purchaseWithName.UserName = user.Name
+		farmer, err := r.DB.GetFarmerByID(context.Background(), purchaseWithName.FarmerID)
+		if err != nil {
+			return nil, err
+		}
+		purchaseWithName.FarmerName = farmer.Name
+		purchaseWithName.FarmerChickenBalance = farmer.ChickenBalance.Float64
+		purchaseWithName.FarmerCashBalance = farmer.CashBalance.Int32
+
+		purchasesToReturn = append(purchasesToReturn, purchaseWithName)
+	}
+
+	var domainPurchases []domain.Purchase
+	for _, purchase := range purchasesToReturn {
+		domainPurchases = append(domainPurchases, domain.Purchase{
+			ID:                   purchase.ID,
+			CreatedAt:            purchase.CreatedAt,
+			UpdatedAt:            purchase.UpdatedAt,
+			Chicken:              purchase.Chicken,
+			PricePerChicken:      purchase.PricePerChicken,
+			UserID:               purchase.UserID,
+			FarmerID:             purchase.FarmerID,
+			UserName:             purchase.UserName,
+			FarmerName:           purchase.FarmerName,
+			FarmerChickenBalance: purchase.FarmerChickenBalance,
+			FarmerCashBalance:    purchase.FarmerCashBalance,
+		})
+	}
+	return domainPurchases, nil
+}
