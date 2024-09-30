@@ -9,20 +9,20 @@ import (
 	"net/http"
 )
 
-type userAuth struct {
-	service app.UserService
+type UserAuth struct {
+	Service app.UserService
 }
 
 type authedHandler func(http.ResponseWriter, *http.Request, *domain.User)
 
-func (a *userAuth) MiddlewareAuth(handler authedHandler) http.HandlerFunc {
+func (a *UserAuth) MiddlewareAuth(handler authedHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		APIKey, err := auth.GetAPIKey(r.Header)
 		if err != nil {
 			jsonresponses.RespondWithError(w, 400, fmt.Sprintf("Auth error: %v", err))
 			return
 		}
-		user, err := a.service.GetUserByAPIKey(APIKey)
+		user, err := a.Service.GetUserByAPIKey(APIKey)
 
 		if err != nil {
 			jsonresponses.RespondWithError(w, 400, fmt.Sprintf("Couldn't get user: %v", err))
