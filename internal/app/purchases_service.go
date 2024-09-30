@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/mike-kimani/whitepointinventory/internal/domain"
 )
 
@@ -40,4 +41,20 @@ func (s *purchaseService) CreatePurchase(chickenNo, chickenPrice int32, farmerNa
 		return nil, err
 	}
 	return purchase, nil
+}
+
+func (s *purchaseService) GetPurchaseByID(ID uuid.UUID) (*domain.Purchase, error) {
+	purchase, err := s.repo.GetPurchaseByID(ID)
+	if err != nil {
+		return nil, err
+	}
+	return purchase, nil
+}
+
+func (s *purchaseService) GetPurchases() ([]domain.Purchase, error) {
+	purchases, err := s.repo.GetPurchases()
+	if err != nil {
+		return nil, err
+	}
+	return purchases, nil
 }
