@@ -15,3 +15,9 @@ type CreateFarmerRequest struct {
 type GetFarmerRequest struct {
 	Name string `json:"name"`
 }
+
+type CreatePurchaseRequest struct {
+	ChickenNo    int32  `json:"chicken"`
+	ChickenPrice int32  `json:"chicken_price"`
+	FarmerName   string `json:"farmer_name"`
+}
