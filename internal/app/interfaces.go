@@ -19,3 +19,9 @@ type FarmerService interface {
 	GetFarmers() ([]domain.Farmer, error)
 	DeleteFarmerByID(ID uuid.UUID) error
 }
+
+type PurchaseService interface {
+	CreatePurchase(chickenNo int32, chickenPrice int32, farmerName string, user *domain.User) (*domain.Purchase, error)
+	GetPurchaseByID(ID uuid.UUID) (*domain.Purchase, error)
+	GetPurchases() ([]domain.Purchase, error)
+}
