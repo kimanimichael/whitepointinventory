@@ -25,3 +25,10 @@ type PurchaseService interface {
 	GetPurchaseByID(ID uuid.UUID) (*domain.Purchase, error)
 	GetPurchases() ([]domain.Purchase, error)
 }
+
+type PaymentsService interface {
+	CreatePayment(cashPaid, chickenPrice int32, farmerName string, user *domain.User) (*domain.Payment, error)
+	GetPaymentByID(ID uuid.UUID) (*domain.Payment, error)
+	GetPayments() ([]domain.Payment, error)
+	DeletePaymentByID(ID uuid.UUID) error
+}
