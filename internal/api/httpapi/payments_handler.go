@@ -13,7 +13,7 @@ import (
 )
 
 type PaymentsHandler struct {
-	service app.PaymentsService
+	service     app.PaymentsService
 	userService app.UserService
 }
 
@@ -88,7 +88,7 @@ func (h *PaymentsHandler) DeletePayment(w http.ResponseWriter, r *http.Request) 
 		httpresponses.RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("Could not parse uuid: %s", paymentIDStr))
 		return
 	}
-	err = h.service.DeletePaymentByID(paymentID
+	err = h.service.DeletePaymentByID(paymentID)
 	if err != nil {
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
