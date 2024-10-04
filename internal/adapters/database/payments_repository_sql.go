@@ -140,6 +140,37 @@ func (r *PaymentRepositorySql) GetPayments() ([]domain.Payment, error) {
 }
 
 func (r *PaymentRepositorySql) DeletePayment(ID uuid.UUID) error {
-	//TODO implement me
-	panic("implement me")
+	cashBalance := sql.NullInt32{}
+	chickenBalance := sql.NullFloat64{}
+	payment, err := r.DB.GetPaymentByID(context.Background(), ID)
+	if err != nil {
+		return err
+	}
+	cashBalance.Int32 = payment.CashPaid
+	cashBalance.Valid = true
+	chickenBalance.Float64 = float64(payment.CashPaid) / float64(payment.PricePerChickenPaid)
+	chickenBalance.Valid = true
+
+	err = r.DB.IncreaseCashOwed(context.Background(), sqlcdatabase.IncreaseCashOwedParams{
+		CashBalance: cashBalance,
+		ID:          payment.FarmerID,
+	})
+	if err != nil {
+		_ = fmt.Errorf("couldn't increase cash owed: %v", err)
+		return err
+	}
+	err = r.DB.IncreaseChickenOwed(context.Background(), sqlcdatabase.IncreaseChickenOwedParams{
+		ChickenBalance: chickenBalance,
+		ID:             payment.FarmerID,
+	})
+	if err != nil {
+		_ = fmt.Errorf("couldn't increase chicken owed: %v", err)
+		return err
+	}
+	err = r.DB.DeletePayments(context.Background(), ID)
+	if err != nil {
+		_ = fmt.Errorf("couldn't delete payment: %v", err)
+		return err
+	}
+	return nil
 }
