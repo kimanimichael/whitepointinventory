@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/google/uuid"
-	sqlcdatabase "github.com/mike-kimani/whitepointinventory/internal/adapters/database/sqlc/gensql"
+	"github.com/mike-kimani/whitepointinventory/internal/adapters/database/sqlc/gensql"
 	"github.com/mike-kimani/whitepointinventory/internal/domain"
 	"github.com/mike-kimani/whitepointinventory/internal/models"
 	"time"
@@ -84,13 +84,59 @@ func (r *PaymentRepositorySql) CreatePayment(cashPaid, chickenPrice int32, farme
 }
 
 func (r *PaymentRepositorySql) GetPaymentByID(ID uuid.UUID) (*domain.Payment, error) {
-	//TODO implement me
-	panic("implement me")
+	payment, err := r.DB.GetPaymentByID(context.Background(), ID)
+	if err != nil {
+		return nil, err
+	}
+	modelPayment := models.DatabasePaymentToPayment(payment)
+	return &domain.Payment{
+		ID:                   modelPayment.ID,
+		CreatedAt:            modelPayment.CreatedAt,
+		UpdatedAt:            modelPayment.UpdatedAt,
+		CashPaid:             modelPayment.CashPaid,
+		PricePerChickenPaid:  modelPayment.PricePerChickenPaid,
+		FarmerID:             modelPayment.FarmerID,
+		UserName:             modelPayment.UserName,
+		FarmerName:           modelPayment.FarmerName,
+		FarmerChickenBalance: modelPayment.FarmerChickenBalance,
+		FarmerCashBalance:    modelPayment.FarmerCashBalance,
+	}, nil
 }
 
 func (r *PaymentRepositorySql) GetPayments() ([]domain.Payment, error) {
-	//TODO implement me
-	panic("implement me")
+	var customPayments []models.Payment
+	var paymentResponse []domain.Payment
+
+	payments, err := r.DB.GetPayments(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	for _, payment := range payments {
+		customPayments = append(customPayments, models.DatabasePaymentToPayment(payment))
+	}
+	for _, customPayment := range customPayments {
+		user, err := r.DB.GetUserByID(context.Background(), customPayment.UserID)
+		if err != nil {
+			return nil, err
+		}
+		farmer, err := r.DB.GetFarmerByID(context.Background(), customPayment.FarmerID)
+		if err != nil {
+			return nil, err
+		}
+		paymentResponse = append(paymentResponse, domain.Payment{
+			ID:                   customPayment.ID,
+			CreatedAt:            customPayment.CreatedAt,
+			UpdatedAt:            customPayment.UpdatedAt,
+			CashPaid:             customPayment.CashPaid,
+			PricePerChickenPaid:  customPayment.PricePerChickenPaid,
+			FarmerID:             customPayment.FarmerID,
+			UserName:             user.Name,
+			FarmerName:           farmer.Name,
+			FarmerChickenBalance: farmer.ChickenBalance.Float64,
+			FarmerCashBalance:    farmer.CashBalance.Int32,
+		})
+	}
+	return paymentResponse, nil
 }
 
 func (r *PaymentRepositorySql) DeletePayment(ID uuid.UUID) error {
