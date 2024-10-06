@@ -82,7 +82,8 @@ func (h *PaymentsHandler) GetPayments(w http.ResponseWriter, r *http.Request) {
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	httpresponses.RespondWithJson(w, http.StatusOK, payments)
+	paymentsResponse := DomainPaymentsToPayments(payments)
+	httpresponses.RespondWithJson(w, http.StatusOK, paymentsResponse)
 }
 
 func (h *PaymentsHandler) DeletePayment(w http.ResponseWriter, r *http.Request, user *domain.User) {

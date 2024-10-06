@@ -82,7 +82,8 @@ func (h *PurchasesHandler) GetPurchases(w http.ResponseWriter, r *http.Request) 
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	httpresponses.RespondWithJson(w, http.StatusOK, purchases)
+	purchasesResponse := DomainPurchasesToPurchases(purchases)
+	httpresponses.RespondWithJson(w, http.StatusOK, purchasesResponse)
 }
 
 func (h *PurchasesHandler) DeletePurchase(w http.ResponseWriter, r *http.Request, user *domain.User) {

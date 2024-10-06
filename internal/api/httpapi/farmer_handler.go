@@ -66,7 +66,8 @@ func (h *FarmerHandler) GetFarmers(w http.ResponseWriter, r *http.Request) {
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Could not get farmers :%v", err))
 		return
 	}
-	httpresponses.RespondWithJson(w, http.StatusOK, farmers)
+	farmersResponse := DomainFarmersToFarmers(farmers)
+	httpresponses.RespondWithJson(w, http.StatusOK, farmersResponse)
 }
 
 func (h *FarmerHandler) DeleteFarmerByID(w http.ResponseWriter, r *http.Request) {
