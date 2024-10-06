@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-chi/chi"
+	"github.com/google/uuid"
 	"github.com/mike-kimani/fechronizo/v2/pkg/httpresponses"
 	"github.com/mike-kimani/whitepointinventory/internal/app"
 	"github.com/mike-kimani/whitepointinventory/internal/domain"
@@ -29,6 +30,7 @@ func (h *PurchasesHandler) RegisterRoutes(router chi.Router) {
 	router.Post("/purchase", purchasesAuth.MiddlewareAuth(h.CreatePurchase))
 	router.Get("/purchase", h.GetPurchaseByID)
 	router.Get("/purchases", h.GetPurchases)
+	router.Delete("/purchases/{purchase_id}", h.DeletePurchase)
 }
 
 func (h *PurchasesHandler) CreatePurchase(w http.ResponseWriter, r *http.Request, user *domain.User) {
@@ -80,4 +82,19 @@ func (h *PurchasesHandler) GetPurchases(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	httpresponses.RespondWithJson(w, http.StatusOK, purchases)
+}
+
+func (h *PurchasesHandler) DeletePurchase(w http.ResponseWriter, r *http.Request) {
+	purchaseIDStr := chi.URLParam(r, "purchase_id")
+	purchaseID, err := uuid.Parse(purchaseIDStr)
+	if err != nil {
+		httpresponses.RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("Could not parse uuid: %s", purchaseIDStr))
+		return
+	}
+	err = h.service.DeletePurchaseByID(purchaseID)
+	if err != nil {
+		httpresponses.RespondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	httpresponses.RespondWithJson(w, http.StatusNoContent, nil)
 }

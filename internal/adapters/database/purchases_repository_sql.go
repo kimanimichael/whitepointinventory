@@ -144,3 +144,40 @@ func (r *PurchasesRepositorySQL) GetPurchases() ([]domain.Purchase, error) {
 	}
 	return domainPurchases, nil
 }
+
+func (r *PurchasesRepositorySQL) DeletePurchase(ID uuid.UUID) error {
+	cashBalance := sql.NullInt32{}
+	chickenBalance := sql.NullFloat64{}
+
+	purchase, err := r.DB.GetPurchaseByID(context.Background(), ID)
+	if err != nil {
+		return err
+	}
+	chickenBalance.Float64 = float64(purchase.Chicken)
+	chickenBalance.Valid = true
+	cashBalance.Int32 = purchase.Chicken * purchase.PricePerChicken
+	cashBalance.Valid = true
+
+	err = r.DB.DecreaseCashOwed(context.Background(), sqlcdatabase.DecreaseCashOwedParams{
+		CashBalance: cashBalance,
+		ID:          purchase.FarmerID,
+	})
+	if err != nil {
+		_ = fmt.Errorf("couldn't increase cash owed: %v", err)
+		return err
+	}
+	err = r.DB.DecreaseChickenOwed(context.Background(), sqlcdatabase.DecreaseChickenOwedParams{
+		ChickenBalance: chickenBalance,
+		ID:             purchase.FarmerID,
+	})
+	if err != nil {
+		_ = fmt.Errorf("couldn't increase chicken owed: %v", err)
+		return err
+	}
+	err = r.DB.DeletePayments(context.Background(), ID)
+	if err != nil {
+		_ = fmt.Errorf("couldn't delete purchase: %v", err)
+		return err
+	}
+	return nil
+}

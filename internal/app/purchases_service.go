@@ -58,3 +58,11 @@ func (s *purchaseService) GetPurchases() ([]domain.Purchase, error) {
 	}
 	return purchases, nil
 }
+
+func (s *purchaseService) DeletePurchaseByID(ID uuid.UUID) error {
+	err := s.repo.DeletePurchase(ID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
