@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-chi/chi"
-	"github.com/google/uuid"
 	"github.com/mike-kimani/fechronizo/v2/pkg/httpresponses"
 	"github.com/mike-kimani/whitepointinventory/internal/app"
 	"github.com/mike-kimani/whitepointinventory/internal/domain"
@@ -59,13 +58,14 @@ func (h *PurchasesHandler) CreatePurchase(w http.ResponseWriter, r *http.Request
 }
 
 func (h *PurchasesHandler) GetPurchaseByID(w http.ResponseWriter, r *http.Request) {
-	purchaseIDStr := chi.URLParam(r, "purchase_id")
-	purchaseID, err := uuid.Parse(purchaseIDStr)
-	if err != nil {
-		httpresponses.RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("Could not parse purchase ID %s: err %s", purchaseIDStr, err))
+	params := GetTransactionRequest{}
+
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&params); err != nil {
+		httpresponses.RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("failed to decode request body"))
 		return
 	}
-	purchase, err := h.service.GetPurchaseByID(purchaseID)
+	purchase, err := h.service.GetPurchaseByID(params.ID)
 	if err != nil {
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
