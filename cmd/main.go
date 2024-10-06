@@ -115,9 +115,11 @@ func main() {
 	//v2Router.Delete("/payments/{payment_id}", middlewareApiCfg.MiddlewareAuth(paymentsApiCfg.HandlerDeletePayment))
 
 	//router.Mount("/v2", v2Router)
+	actualRouter := chi.NewRouter()
+	actualRouter.Mount("/whitepoint", router)
 
 	srv := &http.Server{
-		Handler: router,
+		Handler: actualRouter,
 		Addr:    ":" + portString,
 	}
 	log.Printf("Server starting on port %s", portString)
