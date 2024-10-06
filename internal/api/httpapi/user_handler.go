@@ -9,12 +9,13 @@ import (
 	"github.com/mike-kimani/fechronizo/v2/pkg/httpresponses"
 	"github.com/mike-kimani/whitepointinventory/internal/app"
 	"github.com/mike-kimani/whitepointinventory/pkg/auth"
+	"github.com/mike-kimani/whitepointinventory/pkg/jsonresponses"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"time"
 )
 
-const secretKey = "emaakama"
+const secretKey = "secret"
 
 type UserHandler struct {
 	service app.UserService
@@ -27,7 +28,7 @@ func NewUserHandler(service app.UserService) *UserHandler {
 }
 
 func (h *UserHandler) RegisterRoutes(router chi.Router) {
-	router.Post("/user", h.CreateUser)
+	router.Post("/users", h.CreateUser)
 	router.Post("/login", h.UserLogin)
 	router.Get("/users", h.GetUserFromCookie)
 	router.Get("/user", h.GetUsers)
@@ -42,7 +43,16 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 		httpresponses.RespondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
-	user, err := h.service.CreateUser(params.Name, params.Email, params.Password)
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(params.Password), 14)
+	if err != nil {
+		jsonresponses.RespondWithError(w, 500, fmt.Sprintf("Error hashing password: %v", err))
+		return
+	}
+	hashedPasswordString := string(hashedPassword)
+	fmt.Println(hashedPasswordString)
+
+	user, err := h.service.CreateUser(params.Name, params.Email, hashedPasswordString)
 	if err != nil {
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -71,7 +81,6 @@ func (h *UserHandler) UserLogin(w http.ResponseWriter, r *http.Request) {
 		httpresponses.RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("User not found: %v", err))
 		return
 	}
-
 	userPasswordBytes := []byte(user.Password)
 	err = bcrypt.CompareHashAndPassword(userPasswordBytes, []byte(password))
 	if err != nil {
