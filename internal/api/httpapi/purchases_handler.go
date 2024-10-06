@@ -28,6 +28,8 @@ func (h *PurchasesHandler) RegisterRoutes(router chi.Router) {
 		Service: h.userService,
 	}
 	router.Post("/purchase", purchasesAuth.MiddlewareAuth(h.CreatePurchase))
+	router.Get("/purchase", h.GetPurchaseByID)
+	router.Get("/purchases", h.GetPurchases)
 }
 
 func (h *PurchasesHandler) CreatePurchase(w http.ResponseWriter, r *http.Request, user *domain.User) {
@@ -56,7 +58,7 @@ func (h *PurchasesHandler) CreatePurchase(w http.ResponseWriter, r *http.Request
 	httpresponses.RespondWithJson(w, http.StatusOK, purchase)
 }
 
-func (h *PurchasesHandler) GetPurchaseByID(w http.ResponseWriter, r *http.Request, user *domain.User) {
+func (h *PurchasesHandler) GetPurchaseByID(w http.ResponseWriter, r *http.Request) {
 	purchaseIDStr := chi.URLParam(r, "purchase_id")
 	purchaseID, err := uuid.Parse(purchaseIDStr)
 	if err != nil {
@@ -71,7 +73,7 @@ func (h *PurchasesHandler) GetPurchaseByID(w http.ResponseWriter, r *http.Reques
 	httpresponses.RespondWithJson(w, http.StatusOK, purchase)
 }
 
-func (h *PurchasesHandler) GetPurchases(w http.ResponseWriter, r *http.Request, user *domain.User) {
+func (h *PurchasesHandler) GetPurchases(w http.ResponseWriter, r *http.Request) {
 	purchases, err := h.service.GetPurchases()
 	if err != nil {
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, err.Error())
