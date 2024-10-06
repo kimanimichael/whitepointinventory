@@ -27,7 +27,10 @@ func (h *PaymentsHandler) RegisterRoutes(router chi.Router) {
 	paymentAuth := middleware.UserAuth{
 		Service: h.userService,
 	}
-	router.Post("/farmers", paymentAuth.MiddlewareAuth(h.CreatePayment))
+	router.Post("/payments", paymentAuth.MiddlewareAuth(h.CreatePayment))
+	router.Get("/payment", h.GetPaymentByID)
+	router.Get("/payments", h.GetPayments)
+	router.Delete("/payments/{payment_id}", h.DeletePayment)
 }
 
 func (h *PaymentsHandler) CreatePayment(w http.ResponseWriter, r *http.Request, user *domain.User) {

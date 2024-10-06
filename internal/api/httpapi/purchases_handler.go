@@ -27,7 +27,7 @@ func (h *PurchasesHandler) RegisterRoutes(router chi.Router) {
 	purchasesAuth := middleware.UserAuth{
 		Service: h.userService,
 	}
-	router.Post("/purchase", purchasesAuth.MiddlewareAuth(h.CreatePurchase))
+	router.Post("/purchases", purchasesAuth.MiddlewareAuth(h.CreatePurchase))
 	router.Get("/purchase", h.GetPurchaseByID)
 	router.Get("/purchases", h.GetPurchases)
 	router.Delete("/purchases/{purchase_id}", h.DeletePurchase)
