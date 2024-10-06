@@ -45,6 +45,7 @@ type Payment struct {
 	UpdatedAt            time.Time
 	CashPaid             int32
 	PricePerChickenPaid  int32
+	UserID               uuid.UUID
 	FarmerID             uuid.UUID
 	UserName             string
 	FarmerName           string

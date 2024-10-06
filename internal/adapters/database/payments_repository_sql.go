@@ -130,6 +130,7 @@ func (r *PaymentRepositorySql) GetPayments() ([]domain.Payment, error) {
 			CashPaid:             customPayment.CashPaid,
 			PricePerChickenPaid:  customPayment.PricePerChickenPaid,
 			FarmerID:             customPayment.FarmerID,
+			UserID:               customPayment.UserID,
 			UserName:             user.Name,
 			FarmerName:           farmer.Name,
 			FarmerChickenBalance: farmer.ChickenBalance.Float64,
