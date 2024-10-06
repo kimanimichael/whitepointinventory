@@ -45,10 +45,14 @@ func main() {
 	// Init repositories
 	userRepositorySQL := database.NewUserRepositorySQL(db)
 	farmerRepositorySQl := database.NewFarmerRepositorySQL(db)
+	purchasesRepositorySQL := database.NewPurchasesRepositorySQL(db)
+	paymentsRepositorySQL := database.NewPaymentsRepositorySQL(db)
 
 	//Init services
 	userService := app.NewUserService(userRepositorySQL)
 	farmerService := app.NewFarmerService(farmerRepositorySQl)
+	purchasesService := app.NewPurchaseService(purchasesRepositorySQL)
+	paymentsService := app.NewPaymentsService(paymentsRepositorySQL)
 
 	router := chi.NewRouter()
 
@@ -65,6 +69,10 @@ func main() {
 	userHandler.RegisterRoutes(router)
 	farmerHandler := httpapi.NewFarmerHandler(farmerService)
 	farmerHandler.RegisterRoutes(router)
+	purchasesHandler := httpapi.NewPurchasesHandler(purchasesService)
+	purchasesHandler.RegisterRoutes(router)
+	paymentsHandler := httpapi.NewPaymentsHandler(paymentsService)
+	paymentsHandler.RegisterRoutes(router)
 
 	//usersApiCfg := users.ApiConfig{
 	//	DB: db,
@@ -81,7 +89,7 @@ func main() {
 	//middlewareApiCfg := middleware.ApiConfig{
 	//	DB: db,
 	//}
-	//
+
 	//paymentsApiCfg := payments.ApiConfig{
 	//	DB: db,
 	//}
