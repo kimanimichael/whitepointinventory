@@ -30,7 +30,7 @@ func (h *PurchasesHandler) RegisterRoutes(router chi.Router) {
 	router.Post("/purchases", purchasesAuth.MiddlewareAuth(h.CreatePurchase))
 	router.Get("/purchase", h.GetPurchaseByID)
 	router.Get("/purchases", h.GetPurchases)
-	router.Delete("/purchases/{purchase_id}", h.DeletePurchase)
+	router.Delete("/purchases/{purchase_id}", purchasesAuth.MiddlewareAuth(h.DeletePurchase))
 }
 
 func (h *PurchasesHandler) CreatePurchase(w http.ResponseWriter, r *http.Request, user *domain.User) {
@@ -84,7 +84,7 @@ func (h *PurchasesHandler) GetPurchases(w http.ResponseWriter, r *http.Request) 
 	httpresponses.RespondWithJson(w, http.StatusOK, purchases)
 }
 
-func (h *PurchasesHandler) DeletePurchase(w http.ResponseWriter, r *http.Request) {
+func (h *PurchasesHandler) DeletePurchase(w http.ResponseWriter, r *http.Request, user *domain.User) {
 	purchaseIDStr := chi.URLParam(r, "purchase_id")
 	purchaseID, err := uuid.Parse(purchaseIDStr)
 	if err != nil {

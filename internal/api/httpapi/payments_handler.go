@@ -30,7 +30,7 @@ func (h *PaymentsHandler) RegisterRoutes(router chi.Router) {
 	router.Post("/payments", paymentAuth.MiddlewareAuth(h.CreatePayment))
 	router.Get("/payment", h.GetPaymentByID)
 	router.Get("/payments", h.GetPayments)
-	router.Delete("/payments/{payment_id}", h.DeletePayment)
+	router.Delete("/payments/{payment_id}", paymentAuth.MiddlewareAuth(h.DeletePayment))
 }
 
 func (h *PaymentsHandler) CreatePayment(w http.ResponseWriter, r *http.Request, user *domain.User) {
@@ -84,7 +84,7 @@ func (h *PaymentsHandler) GetPayments(w http.ResponseWriter, r *http.Request) {
 	httpresponses.RespondWithJson(w, http.StatusOK, payments)
 }
 
-func (h *PaymentsHandler) DeletePayment(w http.ResponseWriter, r *http.Request) {
+func (h *PaymentsHandler) DeletePayment(w http.ResponseWriter, r *http.Request, user *domain.User) {
 	paymentIDStr := chi.URLParam(r, "payment_id")
 	paymentID, err := uuid.Parse(paymentIDStr)
 	if err != nil {
