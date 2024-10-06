@@ -30,6 +30,6 @@ type CreatePaymentRequest struct {
 	FarmerName   string `json:"farmer_name"`
 }
 
-type GetPaymentRequest struct {
+type GetTransactionRequest struct {
 	ID uuid.UUID `json:"payment_id"`
 }

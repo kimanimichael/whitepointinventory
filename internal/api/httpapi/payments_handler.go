@@ -56,7 +56,7 @@ func (h *PaymentsHandler) CreatePayment(w http.ResponseWriter, r *http.Request, 
 }
 
 func (h *PaymentsHandler) GetPaymentByID(w http.ResponseWriter, r *http.Request) {
-	params := GetPaymentRequest{}
+	params := GetTransactionRequest{}
 
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&params); err != nil {
