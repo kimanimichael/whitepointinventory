@@ -7,7 +7,7 @@ import (
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
 	"github.com/mike-kimani/whitepointinventory/internal/adapters/database"
-	sqlcdatabase "github.com/mike-kimani/whitepointinventory/internal/adapters/database/sqlc/gensql"
+	"github.com/mike-kimani/whitepointinventory/internal/adapters/database/sqlc/gensql"
 	"github.com/mike-kimani/whitepointinventory/internal/api/httpapi"
 	"github.com/mike-kimani/whitepointinventory/internal/app"
 	"log"
@@ -69,9 +69,9 @@ func main() {
 	userHandler.RegisterRoutes(router)
 	farmerHandler := httpapi.NewFarmerHandler(farmerService)
 	farmerHandler.RegisterRoutes(router)
-	purchasesHandler := httpapi.NewPurchasesHandler(purchasesService)
+	purchasesHandler := httpapi.NewPurchasesHandler(purchasesService, userService)
 	purchasesHandler.RegisterRoutes(router)
-	paymentsHandler := httpapi.NewPaymentsHandler(paymentsService)
+	paymentsHandler := httpapi.NewPaymentsHandler(paymentsService, userService)
 	paymentsHandler.RegisterRoutes(router)
 
 	//usersApiCfg := users.ApiConfig{

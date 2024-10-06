@@ -17,9 +17,10 @@ type PurchasesHandler struct {
 	userService app.UserService
 }
 
-func NewPurchasesHandler(service app.PurchaseService) *PurchasesHandler {
+func NewPurchasesHandler(service app.PurchaseService, userService app.UserService) *PurchasesHandler {
 	return &PurchasesHandler{
-		service: service,
+		service:     service,
+		userService: userService,
 	}
 }
 
