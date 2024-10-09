@@ -45,6 +45,7 @@ func (r *PaymentRepositorySql) CreatePayment(cashPaid, chickenPrice int32, farme
 	cashBalance.Valid = true
 
 	chickenBalance.Float64 = float64(cashPaid) / float64(chickenPrice)
+	chickenBalance.Valid = true
 
 	err = r.DB.DecreaseChickenOwed(context.Background(), sqlcdatabase.DecreaseChickenOwedParams{
 		ChickenBalance: chickenBalance,

@@ -26,7 +26,7 @@ func NewPurchasesRepositorySQL(db *sqlcdatabase.Queries) *PurchasesRepositorySQL
 func (r *PurchasesRepositorySQL) CreatePurchase(chickenNo, chickenPrice int32, farmerName string, user *domain.User) (*domain.Purchase, error) {
 	farmer, err := r.DB.GetFarmerByName(context.Background(), farmerName)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not get farmer: %w", err)
 	}
 	purchase, err := r.DB.CreatePurchase(context.Background(), sqlcdatabase.CreatePurchaseParams{
 		ID:              uuid.New(),
