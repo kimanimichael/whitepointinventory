@@ -41,6 +41,7 @@ func (s *userService) GetUserByID(ID uuid.UUID) (*domain.User, error) {
 		return nil, err
 	}
 	return &domain.User{
+		ID:        user.ID,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 		Name:      user.Name,

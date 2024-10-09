@@ -132,7 +132,9 @@ func (h *UserHandler) GetUserFromCookie(w http.ResponseWriter, r *http.Request) 
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Error getting user: %v", err))
 		return
 	}
-	httpresponses.RespondWithJson(w, http.StatusOK, user)
+	fmt.Println(user)
+	userToReturn := DomainUserToUser(*user)
+	httpresponses.RespondWithJson(w, http.StatusOK, userToReturn)
 }
 
 func (h *UserHandler) UserLogout(w http.ResponseWriter, r *http.Request) {

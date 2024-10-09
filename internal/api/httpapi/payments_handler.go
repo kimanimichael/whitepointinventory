@@ -56,7 +56,8 @@ func (h *PaymentsHandler) CreatePayment(w http.ResponseWriter, r *http.Request, 
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	httpresponses.RespondWithJson(w, http.StatusCreated, payment)
+	paymentResponse := DomainPaymentToPayment(*payment)
+	httpresponses.RespondWithJson(w, http.StatusCreated, paymentResponse)
 }
 
 func (h *PaymentsHandler) GetPaymentByID(w http.ResponseWriter, r *http.Request) {
