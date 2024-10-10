@@ -36,6 +36,11 @@ func (h *FarmerHandler) CreateFarmer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if params.Name == "" {
+		httpresponses.RespondWithError(w, http.StatusBadRequest, "Farmer name is required")
+		return
+	}
+
 	farmer, err := h.service.CreateFarmer(params.Name, params.ChickenBalance, params.CashBalance)
 	if err != nil {
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Could not create farmer :%v", err))
