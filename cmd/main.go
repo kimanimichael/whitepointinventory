@@ -74,47 +74,6 @@ func main() {
 	paymentsHandler := httpapi.NewPaymentsHandler(paymentsService, userService)
 	paymentsHandler.RegisterRoutes(router)
 
-	//usersApiCfg := users.ApiConfig{
-	//	DB: db,
-	//}
-
-	//purchasesApiCfg := purchases.ApiConfig{
-	//	DB: db,
-	//}
-	//
-	//farmersApiCfg := farmers.ApiConfig{
-	//	DB: db,
-	//}
-	//
-	//middlewareApiCfg := middleware.ApiConfig{
-	//	DB: db,
-	//}
-
-	//paymentsApiCfg := payments.ApiConfig{
-	//	DB: db,
-	//}
-
-	//v2Router := chi.NewRouter()
-	//v2Router.Get("/health", health.HandlerHealth)
-	//v2Router.Post("/users", usersApiCfg.HandlerCreateUser)
-	//v2Router.Get("/users", usersApiCfg.HandlerGetUserFromCookie)
-	//v2Router.Get("/user", usersApiCfg.HandlerGetUsers)
-	//v2Router.Post("/login", usersApiCfg.HandlerUserLogin)
-	//v2Router.Post("/logout", usersApiCfg.HandlerUserLogout)
-	//v2Router.Post("/farmers", farmersApiCfg.HandlerCreateFarmer)
-	//v2Router.Get("/farmers", farmersApiCfg.HandlerGetFarmerByName)
-	//v2Router.Get("/farmer", farmersApiCfg.HandlerGetFarmers)
-	//v2Router.Delete("/farmers/{farmer_id}", farmersApiCfg.HandlerDeleteFarmer)
-	//v2Router.Post("/purchases", middlewareApiCfg.MiddlewareAuth(purchasesApiCfg.HandlerCreatePurchases))
-	//v2Router.Get("/purchases", purchasesApiCfg.HandlerGetPurchases)
-	//v2Router.Get("/purchase", purchasesApiCfg.HandlerGetPurchaseByID)
-	//v2Router.Delete("/purchases/{purchase_id}", middlewareApiCfg.MiddlewareAuth(purchasesApiCfg.HandlerDeletePurchase))
-	//v2Router.Post("/payments", middlewareApiCfg.MiddlewareAuth(paymentsApiCfg.HandlerCreatePayment))
-	//v2Router.Get("/payment", paymentsApiCfg.HandlerGetPaymentByID)
-	//v2Router.Get("/payments", paymentsApiCfg.HandlerGetPayments)
-	//v2Router.Delete("/payments/{payment_id}", middlewareApiCfg.MiddlewareAuth(paymentsApiCfg.HandlerDeletePayment))
-
-	//router.Mount("/v2", v2Router)
 	actualRouter := chi.NewRouter()
 	actualRouter.Mount("/whitepoint", router)
 
