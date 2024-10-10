@@ -24,7 +24,7 @@ func NewPaymentsRepositorySQL(DB *sqlcdatabase.Queries) *PaymentRepositorySql {
 func (r *PaymentRepositorySql) CreatePayment(cashPaid, chickenPrice int32, farmerName string, user *domain.User) (*domain.Payment, error) {
 	farmer, err := r.DB.GetFarmerByName(context.Background(), farmerName)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error getting farmer: %v", err)
 	}
 	payment, err := r.DB.CreatePayment(context.Background(), sqlcdatabase.CreatePaymentParams{
 		ID:                  uuid.New(),
@@ -36,7 +36,7 @@ func (r *PaymentRepositorySql) CreatePayment(cashPaid, chickenPrice int32, farme
 		FarmerID:            farmer.ID,
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error creating payment: %v", err)
 	}
 	cashBalance := sql.NullInt32{}
 	chickenBalance := sql.NullFloat64{}
@@ -92,7 +92,7 @@ func (r *PaymentRepositorySql) CreatePayment(cashPaid, chickenPrice int32, farme
 func (r *PaymentRepositorySql) GetPaymentByID(ID uuid.UUID) (*domain.Payment, error) {
 	payment, err := r.DB.GetPaymentByID(context.Background(), ID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error getting payment from ID: %v", err)
 	}
 	modelPayment := models.DatabasePaymentToPayment(payment)
 	return &domain.Payment{
@@ -115,7 +115,7 @@ func (r *PaymentRepositorySql) GetPayments() ([]domain.Payment, error) {
 
 	payments, err := r.DB.GetPayments(context.Background())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error getting payments: %v", err)
 	}
 	for _, payment := range payments {
 		customPayments = append(customPayments, models.DatabasePaymentToPayment(payment))
@@ -123,11 +123,11 @@ func (r *PaymentRepositorySql) GetPayments() ([]domain.Payment, error) {
 	for _, customPayment := range customPayments {
 		user, err := r.DB.GetUserByID(context.Background(), customPayment.UserID)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error getting user from payment: %v", err)
 		}
 		farmer, err := r.DB.GetFarmerByID(context.Background(), customPayment.FarmerID)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error getting farmer from payment: %v", err)
 		}
 		paymentResponse = append(paymentResponse, domain.Payment{
 			ID:                   customPayment.ID,
@@ -151,7 +151,7 @@ func (r *PaymentRepositorySql) DeletePayment(ID uuid.UUID) error {
 	chickenBalance := sql.NullFloat64{}
 	payment, err := r.DB.GetPaymentByID(context.Background(), ID)
 	if err != nil {
-		return err
+		return fmt.Errorf("error getting payment from ID: %v", err)
 	}
 	cashBalance.Int32 = payment.CashPaid
 	cashBalance.Valid = true
@@ -163,21 +163,18 @@ func (r *PaymentRepositorySql) DeletePayment(ID uuid.UUID) error {
 		ID:          payment.FarmerID,
 	})
 	if err != nil {
-		_ = fmt.Errorf("couldn't increase cash owed: %v", err)
-		return err
+		return fmt.Errorf("error increasing cash owed: %v", err)
 	}
 	err = r.DB.IncreaseChickenOwed(context.Background(), sqlcdatabase.IncreaseChickenOwedParams{
 		ChickenBalance: chickenBalance,
 		ID:             payment.FarmerID,
 	})
 	if err != nil {
-		_ = fmt.Errorf("couldn't increase chicken owed: %v", err)
-		return err
+		return fmt.Errorf("error increasing chicken owed: %v", err)
 	}
 	err = r.DB.DeletePayments(context.Background(), ID)
 	if err != nil {
-		_ = fmt.Errorf("couldn't delete payment: %v", err)
-		return err
+		return fmt.Errorf("error deleting payment: %v", err)
 	}
 	return nil
 }

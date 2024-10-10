@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"github.com/google/uuid"
 	sqlcdatabase "github.com/mike-kimani/whitepointinventory/internal/adapters/database/sqlc/gensql"
 	"github.com/mike-kimani/whitepointinventory/internal/domain"
@@ -39,7 +40,7 @@ func (r *FarmerRepositorySQL) CreateFarmer(name string, chickenBalance float64, 
 		CashBalance:    _cashBalance,
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error creating farmer: %v", err)
 	}
 	return &domain.Farmer{
 		ID:             farmer.ID,
@@ -54,7 +55,7 @@ func (r *FarmerRepositorySQL) CreateFarmer(name string, chickenBalance float64, 
 func (r *FarmerRepositorySQL) GetFarmerByName(name string) (*domain.Farmer, error) {
 	farmer, err := r.DB.GetFarmerByName(context.Background(), name)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error getting farmer: %v", err)
 	}
 	return &domain.Farmer{
 		ID:             farmer.ID,
@@ -69,7 +70,7 @@ func (r *FarmerRepositorySQL) GetFarmerByName(name string) (*domain.Farmer, erro
 func (r *FarmerRepositorySQL) GetFarmers() ([]domain.Farmer, error) {
 	farmers, err := r.DB.GetFarmers(context.Background())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error creating farmers: %v", err)
 	}
 	var farmersToReturn []domain.Farmer
 	for _, farmer := range farmers {
@@ -88,7 +89,7 @@ func (r *FarmerRepositorySQL) GetFarmers() ([]domain.Farmer, error) {
 func (r *FarmerRepositorySQL) DeleteFarmerByID(ID uuid.UUID) error {
 	err := r.DB.DeleteFarmers(context.Background(), ID)
 	if err != nil {
-		return err
+		return fmt.Errorf("error deleting farmer: %v", err)
 	}
 	return nil
 }

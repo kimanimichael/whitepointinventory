@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/mike-kimani/whitepointinventory/internal/adapters/database/sqlc/gensql"
 	"github.com/mike-kimani/whitepointinventory/internal/domain"
@@ -31,7 +32,7 @@ func (r *UserRepositorySql) CreateUser(name, email, password string) (*domain.Us
 		Password:  password,
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error creating user: %v", err)
 	}
 	modelUser := models.DatabaseUserToUser(user)
 	return &domain.User{
@@ -47,7 +48,7 @@ func (r *UserRepositorySql) CreateUser(name, email, password string) (*domain.Us
 func (r *UserRepositorySql) GetUserByID(ID uuid.UUID) (*domain.User, error) {
 	user, err := r.DB.GetUserByID(context.Background(), ID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error getting user: %v", err)
 	}
 	modelUser := models.DatabaseUserToUser(user)
 	return &domain.User{
@@ -63,7 +64,7 @@ func (r *UserRepositorySql) GetUserByID(ID uuid.UUID) (*domain.User, error) {
 func (r *UserRepositorySql) GetUserByEmail(email string) (*domain.User, error) {
 	user, err := r.DB.GetUserByEmail(context.Background(), email)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error getting user from email: %v", err)
 	}
 	modelUser := models.DatabaseUserToUser(user)
 	return &domain.User{
@@ -80,7 +81,7 @@ func (r *UserRepositorySql) GetUserByEmail(email string) (*domain.User, error) {
 func (r *UserRepositorySql) GetUserByAPIKey(key string) (*domain.User, error) {
 	user, err := r.DB.GetUserByAPIKey(context.Background(), key)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error getting user from APIKey: %v", err)
 	}
 	modelUser := models.DatabaseUserToUser(user)
 	return &domain.User{
@@ -97,7 +98,7 @@ func (r *UserRepositorySql) GetUserByAPIKey(key string) (*domain.User, error) {
 func (r *UserRepositorySql) GetUsers() ([]domain.User, error) {
 	users, err := r.DB.GetUsers(context.Background())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error getting users: %v", err)
 	}
 
 	var userList []domain.User
