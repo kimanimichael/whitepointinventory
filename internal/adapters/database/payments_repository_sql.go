@@ -66,8 +66,12 @@ func (r *PaymentRepositorySql) CreatePayment(cashPaid, chickenPrice int32, farme
 	if err != nil {
 		_ = fmt.Errorf("couldn't mark farmer as updated: %v", err)
 	}
+	updatedFarmer, err := r.DB.GetFarmerByName(context.Background(), farmerName)
+	if err != nil {
+		_ = fmt.Errorf("couldn't get farmer by name: %v", err)
+	}
 
-	fmt.Printf("Farmer %v updated at updated to %v\n", farmer.Name, time.Now())
+	fmt.Printf("Farmer %v updated at %v\n", farmer.Name, time.Now())
 
 	modelPayment := models.DatabasePaymentToPayment(payment)
 	return &domain.Payment{
@@ -76,11 +80,12 @@ func (r *PaymentRepositorySql) CreatePayment(cashPaid, chickenPrice int32, farme
 		UpdatedAt:            modelPayment.UpdatedAt,
 		CashPaid:             modelPayment.CashPaid,
 		PricePerChickenPaid:  modelPayment.PricePerChickenPaid,
+		UserID:               modelPayment.UserID,
 		FarmerID:             modelPayment.FarmerID,
-		UserName:             modelPayment.UserName,
-		FarmerName:           modelPayment.FarmerName,
-		FarmerChickenBalance: modelPayment.FarmerChickenBalance,
-		FarmerCashBalance:    modelPayment.FarmerCashBalance,
+		UserName:             user.Name,
+		FarmerName:           farmer.Name,
+		FarmerChickenBalance: updatedFarmer.ChickenBalance.Float64,
+		FarmerCashBalance:    updatedFarmer.CashBalance.Int32,
 	}, nil
 }
 

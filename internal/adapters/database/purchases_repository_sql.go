@@ -67,18 +67,27 @@ func (r *PurchasesRepositorySQL) CreatePurchase(chickenNo, chickenPrice int32, f
 		fmt.Printf("Could not mark farmer as updated: %v\n", err)
 	}
 	if err == nil {
-		fmt.Printf("Farmer %v updated at updated to %v\n", farmer.Name, time.Now())
+		fmt.Printf("Farmer %v updated at %v\n", farmer.Name, time.Now())
+	}
+
+	updatedFarmer, err := r.DB.GetFarmerByName(context.Background(), farmerName)
+	if err != nil {
+		_ = fmt.Errorf("couldn't get farmer by name: %v", err)
 	}
 
 	modelPurchase := models.DatabasePurchaseToPurchase(purchase)
 	return &domain.Purchase{
-		ID:              modelPurchase.ID,
-		CreatedAt:       modelPurchase.CreatedAt,
-		UpdatedAt:       modelPurchase.UpdatedAt,
-		FarmerID:        modelPurchase.FarmerID,
-		UserID:          modelPurchase.UserID,
-		Chicken:         modelPurchase.Chicken,
-		PricePerChicken: modelPurchase.PricePerChicken,
+		ID:                   modelPurchase.ID,
+		CreatedAt:            modelPurchase.CreatedAt,
+		UpdatedAt:            modelPurchase.UpdatedAt,
+		FarmerID:             modelPurchase.FarmerID,
+		UserID:               modelPurchase.UserID,
+		FarmerName:           farmer.Name,
+		UserName:             user.Name,
+		Chicken:              modelPurchase.Chicken,
+		PricePerChicken:      modelPurchase.PricePerChicken,
+		FarmerChickenBalance: updatedFarmer.ChickenBalance.Float64,
+		FarmerCashBalance:    updatedFarmer.CashBalance.Int32,
 	}, nil
 }
 
