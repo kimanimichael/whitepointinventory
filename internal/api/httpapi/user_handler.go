@@ -50,7 +50,6 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	hashedPasswordString := string(hashedPassword)
-	fmt.Println(hashedPasswordString)
 
 	user, err := h.service.CreateUser(params.Name, params.Email, hashedPasswordString)
 	if err != nil {
@@ -104,7 +103,8 @@ func (h *UserHandler) UserLogin(w http.ResponseWriter, r *http.Request) {
 		HttpOnly: true,
 	}
 	http.SetCookie(w, &cookie)
-	httpresponses.RespondWithJson(w, http.StatusOK, user)
+	userToReturn := DomainUserToUser(*user)
+	httpresponses.RespondWithJson(w, http.StatusOK, userToReturn)
 }
 
 func (h *UserHandler) GetUserFromCookie(w http.ResponseWriter, r *http.Request) {

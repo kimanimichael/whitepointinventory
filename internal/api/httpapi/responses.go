@@ -128,7 +128,6 @@ func DomainUserToUser(domainUser domain.User) User {
 		Name:      domainUser.Name,
 		ApiKey:    domainUser.APIKey,
 		Email:     domainUser.Email,
-		Password:  domainUser.Password,
 	}
 }
 
