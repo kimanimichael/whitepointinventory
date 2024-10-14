@@ -16,4 +16,8 @@ require (
 	golang.org/x/crypto v0.24.0
 )
 
-require github.com/mike-kimani/fechronizo/v2 v2.0.1 // indirect
+require (
+	github.com/mike-kimani/fechronizo/v2 v2.0.1 // indirect
+	github.com/nelkinda/health-go v0.0.1 // indirect
+	github.com/nelkinda/http-go v0.0.1 // indirect
+)

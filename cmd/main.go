@@ -74,6 +74,8 @@ func main() {
 	paymentsHandler := httpapi.NewPaymentsHandler(paymentsService, userService)
 	paymentsHandler.RegisterRoutes(router)
 
+	httpapi.RegisterHandlerRoutes(router)
+
 	actualRouter := chi.NewRouter()
 	actualRouter.Mount("/whitepoint", router)
 
