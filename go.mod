@@ -15,3 +15,9 @@ require (
 	github.com/lib/pq v1.10.9
 	golang.org/x/crypto v0.24.0
 )
+
+require (
+	github.com/mike-kimani/fechronizo/v2 v2.0.1 // indirect
+	github.com/nelkinda/health-go v0.0.1 // indirect
+	github.com/nelkinda/http-go v0.0.1 // indirect
+)
