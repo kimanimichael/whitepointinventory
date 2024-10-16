@@ -9,7 +9,6 @@ import (
 	"github.com/mike-kimani/fechronizo/v2/pkg/httpresponses"
 	"github.com/mike-kimani/whitepointinventory/internal/app"
 	"github.com/mike-kimani/whitepointinventory/pkg/auth"
-	"github.com/mike-kimani/whitepointinventory/pkg/jsonresponses"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"time"
@@ -46,7 +45,7 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(params.Password), 14)
 	if err != nil {
-		jsonresponses.RespondWithError(w, 500, fmt.Sprintf("Error hashing password: %v", err))
+		httpresponses.RespondWithError(w, 500, fmt.Sprintf("Error hashing password: %v", err))
 		return
 	}
 	hashedPasswordString := string(hashedPassword)
