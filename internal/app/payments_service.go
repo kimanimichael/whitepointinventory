@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/mike-kimani/whitepointinventory/internal/domain"
+	"time"
 )
 
 // MinCashPaid prevents swapping errors of cash paid and chicken price
@@ -34,6 +35,34 @@ func (s *paymentsService) CreatePayment(cashPaid, chickenPrice int32, farmerName
 	}
 	if chickenPrice < MinChickenPrice || chickenPrice > MaxChickenPrice {
 		return nil, fmt.Errorf("chicken price must be within %d and %d", MinChickenPrice, MaxChickenPrice)
+	}
+
+	mostRecentPayment, err := s.repo.GetMostRecentPayment()
+	if err != nil {
+		return nil, err
+	}
+	currentTime := time.Now()
+	correctedMostRecentPaymentTime := time.Date(
+		mostRecentPayment.CreatedAt.Year(),
+		mostRecentPayment.CreatedAt.Month(),
+		mostRecentPayment.CreatedAt.Day(),
+		mostRecentPayment.CreatedAt.Hour(),
+		mostRecentPayment.CreatedAt.Minute(),
+		mostRecentPayment.CreatedAt.Second(),
+		mostRecentPayment.CreatedAt.Nanosecond(),
+		time.FixedZone("EAT", 3*60*60),
+	)
+	durationSinceLastPayment := currentTime.Sub(correctedMostRecentPaymentTime)
+
+	if durationSinceLastPayment < IdenticalTransactionInterval {
+		fmt.Printf("Duration Since Last Payment less than %d minutes\n", IdenticalTransactionInterval/time.Minute)
+		if mostRecentPayment.FarmerName == farmerName {
+			if mostRecentPayment.CashPaid == cashPaid {
+				if mostRecentPayment.PricePerChickenPaid == chickenPrice {
+					return nil, fmt.Errorf("identical payment made for Farmer %s. Wait for %d seconds", farmerName, int(IdenticalTransactionInterval.Seconds()-durationSinceLastPayment.Seconds()))
+				}
+			}
+		}
 	}
 
 	payment, err := s.repo.CreatePayment(cashPaid, chickenPrice, farmerName, user)

@@ -61,6 +61,27 @@ func (q *Queries) DeletePurchase(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
+const getMostRecentPurchase = `-- name: GetMostRecentPurchase :one
+SELECT id, created_at, updated_at, chicken, price_per_chicken, user_id, farmer_id FROM purchases
+ORDER BY created_at DESC
+    LIMIT 1
+`
+
+func (q *Queries) GetMostRecentPurchase(ctx context.Context) (Purchase, error) {
+	row := q.db.QueryRowContext(ctx, getMostRecentPurchase)
+	var i Purchase
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Chicken,
+		&i.PricePerChicken,
+		&i.UserID,
+		&i.FarmerID,
+	)
+	return i, err
+}
+
 const getPurchaseByID = `-- name: GetPurchaseByID :one
 
 SELECT id, created_at, updated_at, chicken, price_per_chicken, user_id, farmer_id FROM purchases

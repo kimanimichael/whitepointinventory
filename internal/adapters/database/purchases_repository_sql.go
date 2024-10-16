@@ -108,6 +108,29 @@ func (r *PurchasesRepositorySQL) GetPurchaseByID(ID uuid.UUID) (*domain.Purchase
 	}, nil
 }
 
+func (r *PurchasesRepositorySQL) GetMostRecentPurchase() (*domain.Purchase, error) {
+	purchase, err := r.DB.GetMostRecentPurchase(context.Background())
+	if err != nil {
+		return nil, fmt.Errorf("error getting most recent purchase: %v", err)
+	}
+	modelPurchase := models.DatabasePurchaseToPurchase(purchase)
+
+	farmer, err := r.DB.GetFarmerByID(context.Background(), purchase.FarmerID)
+	if err != nil {
+		return nil, fmt.Errorf("error getting farmer from most recent purchase: %v", err)
+	}
+	return &domain.Purchase{
+		ID:              modelPurchase.ID,
+		CreatedAt:       modelPurchase.CreatedAt,
+		UpdatedAt:       modelPurchase.UpdatedAt,
+		FarmerID:        modelPurchase.FarmerID,
+		FarmerName:      farmer.Name,
+		UserID:          modelPurchase.UserID,
+		Chicken:         modelPurchase.Chicken,
+		PricePerChicken: modelPurchase.PricePerChicken,
+	}, nil
+}
+
 func (r *PurchasesRepositorySQL) GetPurchases() ([]domain.Purchase, error) {
 	purchases, err := r.DB.GetPurchases(context.Background())
 	if err != nil {

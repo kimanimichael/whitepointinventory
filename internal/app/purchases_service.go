@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/mike-kimani/whitepointinventory/internal/domain"
+	"time"
 )
 
 // MinChickenNumber prevents zero value chicken number entries
@@ -17,6 +18,8 @@ const MinChickenPrice = 100
 
 // MaxChickenPrice prevents entry errors e.g. 4500 instead of 450 for price
 const MaxChickenPrice = 1000
+
+const IdenticalTransactionInterval = 2 * time.Minute
 
 type purchaseService struct {
 	repo domain.PurchasesRepository
@@ -36,6 +39,34 @@ func (s *purchaseService) CreatePurchase(chickenNo, chickenPrice int32, farmerNa
 	if chickenPrice < MinChickenPrice || chickenPrice > MaxChickenPrice {
 		return nil, fmt.Errorf("chicken price must be within %d and %d", MinChickenPrice, MaxChickenPrice)
 	}
+	mostRecentPurchase, err := s.repo.GetMostRecentPurchase()
+	if err != nil {
+		return nil, err
+	}
+	currentTime := time.Now()
+	correctedMostRecentPurchaseTime := time.Date(
+		mostRecentPurchase.CreatedAt.Year(),
+		mostRecentPurchase.CreatedAt.Month(),
+		mostRecentPurchase.CreatedAt.Day(),
+		mostRecentPurchase.CreatedAt.Hour(),
+		mostRecentPurchase.CreatedAt.Minute(),
+		mostRecentPurchase.CreatedAt.Second(),
+		mostRecentPurchase.CreatedAt.Nanosecond(),
+		time.FixedZone("EAT", 3*60*60),
+	)
+	durationSinceLastPurchase := currentTime.Sub(correctedMostRecentPurchaseTime)
+
+	if durationSinceLastPurchase < IdenticalTransactionInterval {
+		fmt.Printf("Duration Since Last Payment less than %d minutes\n", IdenticalTransactionInterval/time.Minute)
+		if mostRecentPurchase.FarmerName == farmerName {
+			if mostRecentPurchase.Chicken == chickenNo {
+				if mostRecentPurchase.PricePerChicken == chickenPrice {
+					return nil, fmt.Errorf("identical purchase made for Farmer %s. Wait for %d seconds", farmerName, int(IdenticalTransactionInterval.Seconds()-durationSinceLastPurchase.Seconds()))
+				}
+			}
+		}
+	}
+
 	purchase, err := s.repo.CreatePurchase(chickenNo, chickenPrice, farmerName, user)
 	if err != nil {
 		return nil, err

@@ -109,6 +109,31 @@ func (r *PaymentRepositorySql) GetPaymentByID(ID uuid.UUID) (*domain.Payment, er
 	}, nil
 }
 
+func (r *PaymentRepositorySql) GetMostRecentPayment() (*domain.Payment, error) {
+	payment, err := r.DB.GetMostRecentPayment(context.Background())
+	if err != nil {
+		return nil, fmt.Errorf("error getting most recent payment: %v", err)
+	}
+	modelPayment := models.DatabasePaymentToPayment(payment)
+	farmer, err := r.DB.GetFarmerByID(context.Background(), payment.FarmerID)
+	if err != nil {
+		return nil, fmt.Errorf("error getting farmer from most recent purchase: %v", err)
+	}
+	return &domain.Payment{
+		ID:                   modelPayment.ID,
+		CreatedAt:            modelPayment.CreatedAt,
+		UpdatedAt:            modelPayment.UpdatedAt,
+		CashPaid:             modelPayment.CashPaid,
+		PricePerChickenPaid:  modelPayment.PricePerChickenPaid,
+		FarmerID:             modelPayment.FarmerID,
+		UserName:             modelPayment.UserName,
+		FarmerName:           farmer.Name,
+		FarmerChickenBalance: modelPayment.FarmerChickenBalance,
+		FarmerCashBalance:    modelPayment.FarmerCashBalance,
+	}, nil
+
+}
+
 func (r *PaymentRepositorySql) GetPayments() ([]domain.Payment, error) {
 	var customPayments []models.Payment
 	var paymentResponse []domain.Payment

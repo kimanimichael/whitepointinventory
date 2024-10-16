@@ -16,3 +16,8 @@ WHERE id = $1;
 
 DELETE FROM purchases WHERE id = $1;
 
+-- name: GetMostRecentPurchase :one
+SELECT * FROM purchases
+ORDER BY created_at DESC
+    LIMIT 1;
+
