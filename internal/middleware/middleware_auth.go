@@ -17,12 +17,12 @@ type authedHandler func(http.ResponseWriter, *http.Request, *domain.User)
 
 func (a *UserAuth) MiddlewareAuth(handler authedHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		APIKey, err := auth.GetAPIKey(r.Header)
+		apiKey, err := auth.GetAPIKey(r.Header)
 		if err != nil {
 			httpresponses.RespondWithError(w, 400, fmt.Sprintf("Auth error: %v", err))
 			return
 		}
-		user, err := a.Service.GetUserByAPIKey(APIKey)
+		user, err := a.Service.GetUserByAPIKey(apiKey)
 
 		if err != nil {
 			httpresponses.RespondWithError(w, 400, fmt.Sprintf("Couldn't get user: %v", err))
