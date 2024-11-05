@@ -3,17 +3,16 @@ package middleware
 import (
 	"fmt"
 	"github.com/mike-kimani/fechronizo/v2/pkg/httpresponses"
-	"github.com/mike-kimani/whitepointinventory/internal/app"
-	"github.com/mike-kimani/whitepointinventory/internal/domain"
+	"github.com/mike-kimani/whitepointinventory/internal/users"
 	"github.com/mike-kimani/whitepointinventory/pkg/auth"
 	"net/http"
 )
 
 type UserAuth struct {
-	Service app.UserService
+	Service users.UserService
 }
 
-type authedHandler func(http.ResponseWriter, *http.Request, *domain.User)
+type authedHandler func(http.ResponseWriter, *http.Request, *users.User)
 
 func (a *UserAuth) MiddlewareAuth(handler authedHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
