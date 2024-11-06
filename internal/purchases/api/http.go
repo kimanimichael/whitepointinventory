@@ -98,5 +98,5 @@ func (h *PurchasesHandler) DeletePurchase(w http.ResponseWriter, r *http.Request
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	httpresponses.RespondWithJson(w, http.StatusNoContent, nil)
+	httpresponses.RespondWithJson(w, http.StatusOK, fmt.Sprintf("Purchase successfully deleted by %v", user.Name))
 }
