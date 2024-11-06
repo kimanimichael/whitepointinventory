@@ -204,7 +204,7 @@ func (r *PurchaseRepositorySQL) DeletePurchase(ID uuid.UUID) error {
 	if err != nil {
 		return fmt.Errorf("couldn't decrease chicken owed: %v", err)
 	}
-	err = r.DB.DeletePayments(context.Background(), ID)
+	err = r.DB.DeletePurchase(context.Background(), ID)
 	if err != nil {
 		return fmt.Errorf("couldn't delete purchase: %v", err)
 	}
