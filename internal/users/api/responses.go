@@ -1,4 +1,4 @@
-package api
+package usersapi
 
 import (
 	"github.com/google/uuid"

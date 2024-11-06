@@ -1,4 +1,4 @@
-package api
+package usersapi
 
 type CreateUserRequest struct {
 	Name     string `json:"name"`

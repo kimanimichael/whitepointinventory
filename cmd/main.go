@@ -6,10 +6,16 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
-	"github.com/mike-kimani/whitepointinventory/internal/adapters/database"
 	"github.com/mike-kimani/whitepointinventory/internal/adapters/database/sqlc/gensql"
 	"github.com/mike-kimani/whitepointinventory/internal/api/httpapi"
-	"github.com/mike-kimani/whitepointinventory/internal/app"
+	"github.com/mike-kimani/whitepointinventory/internal/farmers"
+	"github.com/mike-kimani/whitepointinventory/internal/farmers/api"
+	"github.com/mike-kimani/whitepointinventory/internal/payments"
+	"github.com/mike-kimani/whitepointinventory/internal/payments/api"
+	"github.com/mike-kimani/whitepointinventory/internal/purchases"
+	"github.com/mike-kimani/whitepointinventory/internal/purchases/api"
+	"github.com/mike-kimani/whitepointinventory/internal/users"
+	"github.com/mike-kimani/whitepointinventory/internal/users/api"
 	"log"
 	"net/http"
 	"os"
@@ -43,16 +49,16 @@ func main() {
 
 	db := sqlcdatabase.New(conn)
 	// Init repositories
-	userRepositorySQL := database.NewUserRepositorySQL(db)
-	farmerRepositorySQl := database.NewFarmerRepositorySQL(db)
-	purchasesRepositorySQL := database.NewPurchasesRepositorySQL(db)
-	paymentsRepositorySQL := database.NewPaymentsRepositorySQL(db)
+	userRepositorySQL := users.NewUserRepositorySQL(db)
+	farmerRepositorySQl := farmers.NewFarmerRepositorySQL(db)
+	purchasesRepositorySQL := purchases.NewPurchaseRepositorySQL(db)
+	paymentsRepositorySQL := payments.NewPaymentsRepositorySQL(db)
 
 	//Init services
-	userService := app.NewUserService(userRepositorySQL)
-	farmerService := app.NewFarmerService(farmerRepositorySQl)
-	purchasesService := app.NewPurchaseService(purchasesRepositorySQL)
-	paymentsService := app.NewPaymentsService(paymentsRepositorySQL)
+	userService := users.NewUserService(userRepositorySQL)
+	farmerService := farmers.NewFarmerService(farmerRepositorySQl)
+	purchasesService := purchases.NewPurchaseService(purchasesRepositorySQL)
+	paymentsService := payments.NewPaymentsService(paymentsRepositorySQL)
 
 	router := chi.NewRouter()
 
@@ -65,13 +71,13 @@ func main() {
 	}))
 
 	//Init http handlers
-	userHandler := httpapi.NewUserHandler(userService)
+	userHandler := usersapi.NewUserHandler(userService)
 	userHandler.RegisterRoutes(router)
-	farmerHandler := httpapi.NewFarmerHandler(farmerService)
+	farmerHandler := farmersapi.NewFarmerHandler(farmerService)
 	farmerHandler.RegisterRoutes(router)
-	purchasesHandler := httpapi.NewPurchasesHandler(purchasesService, userService)
+	purchasesHandler := purchasesapi.NewPurchasesHandler(purchasesService, userService)
 	purchasesHandler.RegisterRoutes(router)
-	paymentsHandler := httpapi.NewPaymentsHandler(paymentsService, userService)
+	paymentsHandler := paymentsapi.NewPaymentsHandler(paymentsService, userService)
 	paymentsHandler.RegisterRoutes(router)
 
 	httpapi.RegisterHandlerRoutes(router)

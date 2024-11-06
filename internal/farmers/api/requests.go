@@ -1,4 +1,4 @@
-package api
+package farmersapi
 
 type CreateFarmerRequest struct {
 	Name           string  `json:"name"`

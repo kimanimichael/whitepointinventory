@@ -1,4 +1,4 @@
-package api
+package paymentsapi
 
 import (
 	"github.com/google/uuid"

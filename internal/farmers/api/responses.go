@@ -1,4 +1,4 @@
-package api
+package farmersapi
 
 import (
 	"github.com/google/uuid"
