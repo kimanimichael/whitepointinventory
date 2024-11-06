@@ -3,7 +3,6 @@ package payments
 import (
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/mike-kimani/whitepointinventory/internal/domain"
 	"github.com/mike-kimani/whitepointinventory/internal/users"
 	"time"
 )
@@ -29,10 +28,10 @@ const IdenticalTransactionInterval = 2 * time.Minute
 //const MaxChickenPrice = 1000
 
 type paymentsService struct {
-	repo domain.PaymentsRepository
+	repo PaymentsRepository
 }
 
-func NewPaymentsService(repo domain.PaymentsRepository) PaymentsService {
+func NewPaymentsService(repo PaymentsRepository) PaymentsService {
 	return &paymentsService{
 		repo: repo,
 	}
