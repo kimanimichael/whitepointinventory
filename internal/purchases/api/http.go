@@ -82,7 +82,7 @@ func (h *PurchasesHandler) GetPurchases(w http.ResponseWriter, r *http.Request) 
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	purchasesResponse := DomainPurchasesToPurchases(fetchedPurchases)
+	purchasesResponse := purchaseToPurchaseResponses(fetchedPurchases)
 	httpresponses.RespondWithJson(w, http.StatusOK, purchasesResponse)
 }
 

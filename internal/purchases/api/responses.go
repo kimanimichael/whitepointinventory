@@ -20,26 +20,26 @@ type PurchaseResponse struct {
 	FarmerCashBalance    int32     `json:"cash_balance"`
 }
 
-func DomainPurchaseToPurchase(domainPurchase purchases.Purchase) PurchaseResponse {
+func purchaseToPurchaseResponse(purchase purchases.Purchase) PurchaseResponse {
 	return PurchaseResponse{
-		ID:                   domainPurchase.ID,
-		CreatedAt:            domainPurchase.CreatedAt,
-		UpdatedAt:            domainPurchase.UpdatedAt,
-		Chicken:              domainPurchase.Chicken,
-		PricePerChicken:      domainPurchase.PricePerChicken,
-		UserID:               domainPurchase.UserID,
-		FarmerID:             domainPurchase.FarmerID,
-		UserName:             domainPurchase.UserName,
-		FarmerName:           domainPurchase.FarmerName,
-		FarmerChickenBalance: domainPurchase.FarmerChickenBalance,
-		FarmerCashBalance:    domainPurchase.FarmerCashBalance,
+		ID:                   purchase.ID,
+		CreatedAt:            purchase.CreatedAt,
+		UpdatedAt:            purchase.UpdatedAt,
+		Chicken:              purchase.Chicken,
+		PricePerChicken:      purchase.PricePerChicken,
+		UserID:               purchase.UserID,
+		FarmerID:             purchase.FarmerID,
+		UserName:             purchase.UserName,
+		FarmerName:           purchase.FarmerName,
+		FarmerChickenBalance: purchase.FarmerChickenBalance,
+		FarmerCashBalance:    purchase.FarmerCashBalance,
 	}
 }
 
-func DomainPurchasesToPurchases(domainPurchases []purchases.Purchase) []PurchaseResponse {
+func purchaseToPurchaseResponses(purchases []purchases.Purchase) []PurchaseResponse {
 	var purchaseResponses []PurchaseResponse
-	for _, domainPurchase := range domainPurchases {
-		purchaseResponses = append(purchaseResponses, DomainPurchaseToPurchase(domainPurchase))
+	for _, domainPurchase := range purchases {
+		purchaseResponses = append(purchaseResponses, purchaseToPurchaseResponse(domainPurchase))
 	}
 	return purchaseResponses
 }

@@ -27,7 +27,7 @@ func userToResponseUser(user users.User) userResponse {
 	}
 }
 
-func DomainUsersToUsers(users []users.User) []userResponse {
+func usersToResponseUsers(users []users.User) []userResponse {
 	var userResponses []userResponse
 	for _, domainUser := range users {
 		userResponses = append(userResponses, userToResponseUser(domainUser))
