@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/mike-kimani/whitepointinventory/internal/adapters/database/sqlc/gensql"
-	"github.com/mike-kimani/whitepointinventory/internal/models"
 	"time"
 )
 
@@ -33,14 +32,13 @@ func (r *UserRepositorySql) CreateUser(name, email, password string) (*User, err
 	if err != nil {
 		return nil, fmt.Errorf("error creating user: %v", err)
 	}
-	modelUser := models.DatabaseUserToUser(user)
 	return &User{
-		ID:        modelUser.ID,
-		CreatedAt: modelUser.CreatedAt,
-		UpdatedAt: modelUser.UpdatedAt,
-		Name:      modelUser.Name,
-		Email:     modelUser.Email,
-		APIKey:    modelUser.ApiKey,
+		ID:        user.ID,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+		Name:      user.Name,
+		Email:     user.Email,
+		APIKey:    user.ApiKey,
 	}, nil
 }
 
@@ -49,14 +47,13 @@ func (r *UserRepositorySql) GetUserByID(ID uuid.UUID) (*User, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error getting user: %v", err)
 	}
-	modelUser := models.DatabaseUserToUser(user)
 	return &User{
-		ID:        modelUser.ID,
-		CreatedAt: modelUser.CreatedAt,
-		UpdatedAt: modelUser.UpdatedAt,
-		Name:      modelUser.Name,
-		Email:     modelUser.Email,
-		APIKey:    modelUser.ApiKey,
+		ID:        user.ID,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+		Name:      user.Name,
+		Email:     user.Email,
+		APIKey:    user.ApiKey,
 	}, nil
 }
 
@@ -65,15 +62,14 @@ func (r *UserRepositorySql) GetUserByEmail(email string) (*User, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error getting user from email: %v", err)
 	}
-	modelUser := models.DatabaseUserToUser(user)
 	return &User{
-		ID:        modelUser.ID,
-		CreatedAt: modelUser.CreatedAt,
-		UpdatedAt: modelUser.UpdatedAt,
-		Name:      modelUser.Name,
-		Email:     modelUser.Email,
-		APIKey:    modelUser.ApiKey,
-		Password:  modelUser.Password,
+		ID:        user.ID,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+		Name:      user.Name,
+		Email:     user.Email,
+		APIKey:    user.ApiKey,
+		Password:  user.Password,
 	}, nil
 }
 
@@ -82,15 +78,14 @@ func (r *UserRepositorySql) GetUserByAPIKey(key string) (*User, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error getting user from APIKey: %v", err)
 	}
-	modelUser := models.DatabaseUserToUser(user)
 	return &User{
-		ID:        modelUser.ID,
-		CreatedAt: modelUser.CreatedAt,
-		UpdatedAt: modelUser.UpdatedAt,
-		Name:      modelUser.Name,
-		Email:     modelUser.Email,
-		APIKey:    modelUser.ApiKey,
-		Password:  modelUser.Password,
+		ID:        user.ID,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+		Name:      user.Name,
+		Email:     user.Email,
+		APIKey:    user.ApiKey,
+		Password:  user.Password,
 	}, nil
 }
 
@@ -102,13 +97,12 @@ func (r *UserRepositorySql) GetUsers() ([]User, error) {
 
 	var userList []User
 	for _, user := range users {
-		modelUser := models.DatabaseUserToUser(user)
 		userList = append(userList, User{
-			ID:        modelUser.ID,
-			CreatedAt: modelUser.CreatedAt,
-			UpdatedAt: modelUser.UpdatedAt,
-			Name:      modelUser.Name,
-			Email:     modelUser.Email,
+			ID:        user.ID,
+			CreatedAt: user.CreatedAt,
+			UpdatedAt: user.UpdatedAt,
+			Name:      user.Name,
+			Email:     user.Email,
 		})
 	}
 	return userList, nil

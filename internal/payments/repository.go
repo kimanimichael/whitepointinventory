@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/mike-kimani/whitepointinventory/internal/adapters/database/sqlc/gensql"
-	"github.com/mike-kimani/whitepointinventory/internal/models"
 	"github.com/mike-kimani/whitepointinventory/internal/users"
 	"time"
 )
@@ -73,15 +72,15 @@ func (r *PaymentRepositorySql) CreatePayment(cashPaid, chickenPrice int32, farme
 
 	fmt.Printf("Farmer %v updated at %v\n", farmer.Name, time.Now())
 
-	modelPayment := models.DatabasePaymentToPayment(payment)
+	//modelPayment := models.DatabasePaymentToPayment(payment)
 	return &Payment{
-		ID:                   modelPayment.ID,
-		CreatedAt:            modelPayment.CreatedAt,
-		UpdatedAt:            modelPayment.UpdatedAt,
-		CashPaid:             modelPayment.CashPaid,
-		PricePerChickenPaid:  modelPayment.PricePerChickenPaid,
-		UserID:               modelPayment.UserID,
-		FarmerID:             modelPayment.FarmerID,
+		ID:                   payment.ID,
+		CreatedAt:            payment.CreatedAt,
+		UpdatedAt:            payment.UpdatedAt,
+		CashPaid:             payment.CashPaid,
+		PricePerChickenPaid:  payment.PricePerChickenPaid,
+		UserID:               payment.UserID,
+		FarmerID:             payment.FarmerID,
 		UserName:             user.Name,
 		FarmerName:           farmer.Name,
 		FarmerChickenBalance: updatedFarmer.ChickenBalance.Float64,
@@ -94,18 +93,14 @@ func (r *PaymentRepositorySql) GetPaymentByID(ID uuid.UUID) (*Payment, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error getting payment from ID: %v", err)
 	}
-	modelPayment := models.DatabasePaymentToPayment(payment)
+	//modelPayment := models.DatabasePaymentToPayment(payment)
 	return &Payment{
-		ID:                   modelPayment.ID,
-		CreatedAt:            modelPayment.CreatedAt,
-		UpdatedAt:            modelPayment.UpdatedAt,
-		CashPaid:             modelPayment.CashPaid,
-		PricePerChickenPaid:  modelPayment.PricePerChickenPaid,
-		FarmerID:             modelPayment.FarmerID,
-		UserName:             modelPayment.UserName,
-		FarmerName:           modelPayment.FarmerName,
-		FarmerChickenBalance: modelPayment.FarmerChickenBalance,
-		FarmerCashBalance:    modelPayment.FarmerCashBalance,
+		ID:                  payment.ID,
+		CreatedAt:           payment.CreatedAt,
+		UpdatedAt:           payment.UpdatedAt,
+		CashPaid:            payment.CashPaid,
+		PricePerChickenPaid: payment.PricePerChickenPaid,
+		FarmerID:            payment.FarmerID,
 	}, nil
 }
 
@@ -114,54 +109,49 @@ func (r *PaymentRepositorySql) GetMostRecentPayment() (*Payment, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error getting most recent payment: %v", err)
 	}
-	modelPayment := models.DatabasePaymentToPayment(payment)
 	farmer, err := r.DB.GetFarmerByID(context.Background(), payment.FarmerID)
 	if err != nil {
 		return nil, fmt.Errorf("error getting farmer from most recent purchase: %v", err)
 	}
 	return &Payment{
-		ID:                   modelPayment.ID,
-		CreatedAt:            modelPayment.CreatedAt,
-		UpdatedAt:            modelPayment.UpdatedAt,
-		CashPaid:             modelPayment.CashPaid,
-		PricePerChickenPaid:  modelPayment.PricePerChickenPaid,
-		FarmerID:             modelPayment.FarmerID,
-		UserName:             modelPayment.UserName,
+		ID:                   payment.ID,
+		CreatedAt:            payment.CreatedAt,
+		UpdatedAt:            payment.UpdatedAt,
+		CashPaid:             payment.CashPaid,
+		PricePerChickenPaid:  payment.PricePerChickenPaid,
+		FarmerID:             payment.FarmerID,
 		FarmerName:           farmer.Name,
-		FarmerChickenBalance: modelPayment.FarmerChickenBalance,
-		FarmerCashBalance:    modelPayment.FarmerCashBalance,
+		FarmerChickenBalance: farmer.ChickenBalance.Float64,
+		FarmerCashBalance:    farmer.CashBalance.Int32,
 	}, nil
 
 }
 
 func (r *PaymentRepositorySql) GetPayments() ([]Payment, error) {
-	var customPayments []models.Payment
 	var paymentResponse []Payment
 
 	payments, err := r.DB.GetPayments(context.Background())
 	if err != nil {
 		return nil, fmt.Errorf("error getting payments: %v", err)
 	}
+
 	for _, payment := range payments {
-		customPayments = append(customPayments, models.DatabasePaymentToPayment(payment))
-	}
-	for _, customPayment := range customPayments {
-		user, err := r.DB.GetUserByID(context.Background(), customPayment.UserID)
+		user, err := r.DB.GetUserByID(context.Background(), payment.UserID)
 		if err != nil {
 			return nil, fmt.Errorf("error getting user from payment: %v", err)
 		}
-		farmer, err := r.DB.GetFarmerByID(context.Background(), customPayment.FarmerID)
+		farmer, err := r.DB.GetFarmerByID(context.Background(), payment.FarmerID)
 		if err != nil {
 			return nil, fmt.Errorf("error getting farmer from payment: %v", err)
 		}
 		paymentResponse = append(paymentResponse, Payment{
-			ID:                   customPayment.ID,
-			CreatedAt:            customPayment.CreatedAt,
-			UpdatedAt:            customPayment.UpdatedAt,
-			CashPaid:             customPayment.CashPaid,
-			PricePerChickenPaid:  customPayment.PricePerChickenPaid,
-			FarmerID:             customPayment.FarmerID,
-			UserID:               customPayment.UserID,
+			ID:                   payment.ID,
+			CreatedAt:            payment.CreatedAt,
+			UpdatedAt:            payment.UpdatedAt,
+			CashPaid:             payment.CashPaid,
+			PricePerChickenPaid:  payment.PricePerChickenPaid,
+			FarmerID:             payment.FarmerID,
+			UserID:               payment.UserID,
 			UserName:             user.Name,
 			FarmerName:           farmer.Name,
 			FarmerChickenBalance: farmer.ChickenBalance.Float64,

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	sqlcdatabase "github.com/mike-kimani/whitepointinventory/internal/adapters/database/sqlc/gensql"
-	"github.com/mike-kimani/whitepointinventory/internal/models"
 	"github.com/mike-kimani/whitepointinventory/internal/users"
 	"time"
 )
@@ -75,17 +74,16 @@ func (r *PurchaseRepositorySQL) CreatePurchase(chickenNo, chickenPrice int32, fa
 		_ = fmt.Errorf("couldn't get farmer by name: %v", err)
 	}
 
-	modelPurchase := models.DatabasePurchaseToPurchase(purchase)
 	return &Purchase{
-		ID:                   modelPurchase.ID,
-		CreatedAt:            modelPurchase.CreatedAt,
-		UpdatedAt:            modelPurchase.UpdatedAt,
-		FarmerID:             modelPurchase.FarmerID,
-		UserID:               modelPurchase.UserID,
+		ID:                   purchase.ID,
+		CreatedAt:            purchase.CreatedAt,
+		UpdatedAt:            purchase.UpdatedAt,
+		FarmerID:             purchase.FarmerID,
+		UserID:               purchase.UserID,
 		FarmerName:           farmer.Name,
 		UserName:             user.Name,
-		Chicken:              modelPurchase.Chicken,
-		PricePerChicken:      modelPurchase.PricePerChicken,
+		Chicken:              purchase.Chicken,
+		PricePerChicken:      purchase.PricePerChicken,
 		FarmerChickenBalance: updatedFarmer.ChickenBalance.Float64,
 		FarmerCashBalance:    updatedFarmer.CashBalance.Int32,
 	}, nil
@@ -96,15 +94,14 @@ func (r *PurchaseRepositorySQL) GetPurchaseByID(ID uuid.UUID) (*Purchase, error)
 	if err != nil {
 		return nil, fmt.Errorf("error getting purchase ID: %v", err)
 	}
-	modelPurchase := models.DatabasePurchaseToPurchase(purchase)
 	return &Purchase{
-		ID:              modelPurchase.ID,
-		CreatedAt:       modelPurchase.CreatedAt,
-		UpdatedAt:       modelPurchase.UpdatedAt,
-		FarmerID:        modelPurchase.FarmerID,
-		UserID:          modelPurchase.UserID,
-		Chicken:         modelPurchase.Chicken,
-		PricePerChicken: modelPurchase.PricePerChicken,
+		ID:              purchase.ID,
+		CreatedAt:       purchase.CreatedAt,
+		UpdatedAt:       purchase.UpdatedAt,
+		FarmerID:        purchase.FarmerID,
+		UserID:          purchase.UserID,
+		Chicken:         purchase.Chicken,
+		PricePerChicken: purchase.PricePerChicken,
 	}, nil
 }
 
@@ -113,21 +110,20 @@ func (r *PurchaseRepositorySQL) GetMostRecentPurchase() (*Purchase, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error getting most recent purchase: %v", err)
 	}
-	modelPurchase := models.DatabasePurchaseToPurchase(purchase)
 
 	farmer, err := r.DB.GetFarmerByID(context.Background(), purchase.FarmerID)
 	if err != nil {
 		return nil, fmt.Errorf("error getting farmer from most recent purchase: %v", err)
 	}
 	return &Purchase{
-		ID:              modelPurchase.ID,
-		CreatedAt:       modelPurchase.CreatedAt,
-		UpdatedAt:       modelPurchase.UpdatedAt,
-		FarmerID:        modelPurchase.FarmerID,
+		ID:              purchase.ID,
+		CreatedAt:       purchase.CreatedAt,
+		UpdatedAt:       purchase.UpdatedAt,
+		FarmerID:        purchase.FarmerID,
 		FarmerName:      farmer.Name,
-		UserID:          modelPurchase.UserID,
-		Chicken:         modelPurchase.Chicken,
-		PricePerChicken: modelPurchase.PricePerChicken,
+		UserID:          purchase.UserID,
+		Chicken:         purchase.Chicken,
+		PricePerChicken: purchase.PricePerChicken,
 	}, nil
 }
 
@@ -136,13 +132,19 @@ func (r *PurchaseRepositorySQL) GetPurchases() ([]Purchase, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error getting purchases: %v", err)
 	}
-	var purchasesWithNames []models.Purchase
-	var purchasesToReturn []models.Purchase
+
+	var purchasesToReturn []Purchase
+
 	for _, purchase := range purchases {
-		purchasesWithNames = append(purchasesWithNames, models.DatabasePurchaseToPurchase(purchase))
-	}
-	for _, purchaseWithName := range purchasesWithNames {
-		user, err := r.DB.GetUserByID(context.Background(), purchaseWithName.UserID)
+		purchaseWithName := &Purchase{
+			ID:              purchase.ID,
+			CreatedAt:       purchase.CreatedAt,
+			UpdatedAt:       purchase.UpdatedAt,
+			Chicken:         purchase.Chicken,
+			PricePerChicken: purchase.PricePerChicken,
+			FarmerID:        purchase.FarmerID,
+		}
+		user, err := r.DB.GetUserByID(context.Background(), purchase.UserID)
 		if err != nil {
 			return nil, fmt.Errorf("error getting user from purchase: %v", err)
 		}
@@ -155,26 +157,10 @@ func (r *PurchaseRepositorySQL) GetPurchases() ([]Purchase, error) {
 		purchaseWithName.FarmerChickenBalance = farmer.ChickenBalance.Float64
 		purchaseWithName.FarmerCashBalance = farmer.CashBalance.Int32
 
-		purchasesToReturn = append(purchasesToReturn, purchaseWithName)
+		purchasesToReturn = append(purchasesToReturn, *purchaseWithName)
 	}
 
-	var domainPurchases []Purchase
-	for _, purchase := range purchasesToReturn {
-		domainPurchases = append(domainPurchases, Purchase{
-			ID:                   purchase.ID,
-			CreatedAt:            purchase.CreatedAt,
-			UpdatedAt:            purchase.UpdatedAt,
-			Chicken:              purchase.Chicken,
-			PricePerChicken:      purchase.PricePerChicken,
-			UserID:               purchase.UserID,
-			FarmerID:             purchase.FarmerID,
-			UserName:             purchase.UserName,
-			FarmerName:           purchase.FarmerName,
-			FarmerChickenBalance: purchase.FarmerChickenBalance,
-			FarmerCashBalance:    purchase.FarmerCashBalance,
-		})
-	}
-	return domainPurchases, nil
+	return purchasesToReturn, nil
 }
 
 func (r *PurchaseRepositorySQL) DeletePurchase(ID uuid.UUID) error {
