@@ -1,6 +1,7 @@
 package farmers
 
 import (
+	"context"
 	"github.com/google/uuid"
 	"time"
 )
@@ -16,14 +17,14 @@ type Farmer struct {
 }
 
 type FarmerService interface {
-	CreateFarmer(name string, chickenBalance float64, cashBalance int32) (*Farmer, error)
+	CreateFarmer(ctx context.Context, name string, chickenBalance float64, cashBalance int32) (*Farmer, error)
 	GetFarmerByName(name string) (*Farmer, error)
 	GetFarmers() ([]Farmer, error)
 	DeleteFarmerByID(ID uuid.UUID) error
 }
 
 type FarmerRepository interface {
-	CreateFarmer(name string, chickenBalance float64, cashBalance int32) (*Farmer, error)
+	CreateFarmer(ctx context.Context, name string, chickenBalance float64, cashBalance int32) (*Farmer, error)
 	GetFarmerByName(string) (*Farmer, error)
 	GetFarmers() ([]Farmer, error)
 	DeleteFarmerByID(ID uuid.UUID) error

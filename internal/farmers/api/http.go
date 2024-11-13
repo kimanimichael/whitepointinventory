@@ -41,7 +41,9 @@ func (h *FarmerHandler) CreateFarmer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	farmer, err := h.service.CreateFarmer(params.Name, params.ChickenBalance, params.CashBalance)
+	ctx := r.Context()
+
+	farmer, err := h.service.CreateFarmer(ctx, params.Name, params.ChickenBalance, params.CashBalance)
 	if err != nil {
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Could not create farmer :%v", err))
 		return

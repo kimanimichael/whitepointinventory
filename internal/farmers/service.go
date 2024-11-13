@@ -1,6 +1,7 @@
 package farmers
 
 import (
+	"context"
 	"github.com/google/uuid"
 )
 
@@ -14,8 +15,8 @@ func NewFarmerService(repo FarmerRepository) FarmerService {
 	}
 }
 
-func (s *farmerService) CreateFarmer(name string, chickenBalance float64, cashBalance int32) (*Farmer, error) {
-	farmer, err := s.repo.CreateFarmer(name, chickenBalance, cashBalance)
+func (s *farmerService) CreateFarmer(ctx context.Context, name string, chickenBalance float64, cashBalance int32) (*Farmer, error) {
+	farmer, err := s.repo.CreateFarmer(ctx, name, chickenBalance, cashBalance)
 	if err != nil {
 		return nil, err
 	}

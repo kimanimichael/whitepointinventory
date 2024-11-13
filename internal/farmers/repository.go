@@ -21,7 +21,7 @@ func NewFarmerRepositorySQL(db *sqlcdatabase.Queries) *FarmerRepositorySQL {
 	}
 }
 
-func (r *FarmerRepositorySQL) CreateFarmer(name string, chickenBalance float64, cashBalance int32) (*Farmer, error) {
+func (r *FarmerRepositorySQL) CreateFarmer(ctx context.Context, name string, chickenBalance float64, cashBalance int32) (*Farmer, error) {
 	var _chickenBalance sql.NullFloat64
 	_chickenBalance.Float64 = chickenBalance
 	_chickenBalance.Valid = true
@@ -30,7 +30,7 @@ func (r *FarmerRepositorySQL) CreateFarmer(name string, chickenBalance float64, 
 	_cashBalance.Int32 = cashBalance
 	_cashBalance.Valid = true
 
-	farmer, err := r.DB.CreateFarmer(context.Background(), sqlcdatabase.CreateFarmerParams{
+	farmer, err := r.DB.CreateFarmer(ctx, sqlcdatabase.CreateFarmerParams{
 		ID:             uuid.New(),
 		CreatedAt:      time.Now(),
 		UpdatedAt:      time.Now(),
