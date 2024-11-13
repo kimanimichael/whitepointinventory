@@ -2,10 +2,10 @@ package httpapi
 
 import (
 	"github.com/go-chi/chi"
+	"github.com/nelkinda/health-go"
+	"github.com/nelkinda/health-go/checks/sysinfo"
+	"github.com/nelkinda/health-go/checks/uptime"
 )
-import "github.com/nelkinda/health-go"
-import "github.com/nelkinda/health-go/checks/uptime"
-import "github.com/nelkinda/health-go/checks/sysinfo"
 
 func RegisterHealthHandlerRoutes(router chi.Router) {
 	h := health.New(
