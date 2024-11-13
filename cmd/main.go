@@ -9,7 +9,7 @@ import (
 	"github.com/mike-kimani/whitepointinventory/internal/adapters/database/sqlc/gensql"
 	"github.com/mike-kimani/whitepointinventory/internal/farmers"
 	"github.com/mike-kimani/whitepointinventory/internal/farmers/api"
-	"github.com/mike-kimani/whitepointinventory/internal/health/httpapi"
+	"github.com/mike-kimani/whitepointinventory/internal/http"
 	"github.com/mike-kimani/whitepointinventory/internal/payments"
 	"github.com/mike-kimani/whitepointinventory/internal/payments/api"
 	"github.com/mike-kimani/whitepointinventory/internal/purchases"
@@ -80,7 +80,7 @@ func main() {
 	paymentsHandler := paymentsapi.NewPaymentsHandler(paymentsService, userService)
 	paymentsHandler.RegisterRoutes(router)
 
-	httpapi.RegisterHandlerRoutes(router)
+	httpapi.RegisterHealthHandlerRoutes(router)
 
 	actualRouter := chi.NewRouter()
 	actualRouter.Mount("/whitepoint", router)

@@ -7,7 +7,7 @@ import "github.com/nelkinda/health-go"
 import "github.com/nelkinda/health-go/checks/uptime"
 import "github.com/nelkinda/health-go/checks/sysinfo"
 
-func RegisterHandlerRoutes(router chi.Router) {
+func RegisterHealthHandlerRoutes(router chi.Router) {
 	h := health.New(
 		health.Health{
 			Version:   "2.0.0",

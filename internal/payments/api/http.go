@@ -6,7 +6,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
 	"github.com/mike-kimani/fechronizo/v2/pkg/httpresponses"
-	"github.com/mike-kimani/whitepointinventory/internal/middleware"
+	"github.com/mike-kimani/whitepointinventory/internal/http"
 	"github.com/mike-kimani/whitepointinventory/internal/payments"
 	"github.com/mike-kimani/whitepointinventory/internal/users"
 	"net/http"
@@ -25,7 +25,7 @@ func NewPaymentsHandler(service payments.PaymentsService, userService users.User
 }
 
 func (h *PaymentsHandler) RegisterRoutes(router chi.Router) {
-	paymentAuth := middleware.UserAuth{
+	paymentAuth := httpapi.UserAuth{
 		Service: h.userService,
 	}
 	router.Post("/payments", paymentAuth.MiddlewareAuth(h.CreatePayment))
