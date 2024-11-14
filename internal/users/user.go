@@ -1,6 +1,7 @@
 package users
 
 import (
+	"context"
 	"github.com/google/uuid"
 	"time"
 )
@@ -16,17 +17,17 @@ type User struct {
 }
 
 type UserService interface {
-	CreateUser(name, email, password string) (*User, error)
-	GetUserByID(ID uuid.UUID) (*User, error)
-	GetUserByEmail(email string) (*User, error)
-	GetUserByAPIKey(APIKey string) (*User, error)
-	GetUsers() ([]User, error)
+	CreateUser(ctx context.Context, name, email, password string) (*User, error)
+	GetUserByID(ctx context.Context, ID uuid.UUID) (*User, error)
+	GetUserByEmail(ctx context.Context, email string) (*User, error)
+	GetUserByAPIKey(ctx context.Context, APIKey string) (*User, error)
+	GetUsers(ctx context.Context) ([]User, error)
 }
 
 type userRepository interface {
-	CreateUser(name, email, password string) (*User, error)
-	GetUserByID(ID uuid.UUID) (*User, error)
-	GetUserByEmail(email string) (*User, error)
-	GetUserByAPIKey(key string) (*User, error)
-	GetUsers() ([]User, error)
+	CreateUser(ctx context.Context, name, email, password string) (*User, error)
+	GetUserByID(ctx context.Context, ID uuid.UUID) (*User, error)
+	GetUserByEmail(ctx context.Context, email string) (*User, error)
+	GetUserByAPIKey(ctx context.Context, key string) (*User, error)
+	GetUsers(ctx context.Context) ([]User, error)
 }

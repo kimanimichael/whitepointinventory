@@ -50,7 +50,9 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 	hashedPasswordString := string(hashedPassword)
 
-	user, err := h.service.CreateUser(params.Name, params.Email, hashedPasswordString)
+	ctx := r.Context()
+
+	user, err := h.service.CreateUser(ctx, params.Name, params.Email, hashedPasswordString)
 	if err != nil {
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -59,7 +61,9 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *UserHandler) GetUsers(w http.ResponseWriter, r *http.Request) {
-	fetchedUsers, err := h.service.GetUsers()
+	ctx := r.Context()
+
+	fetchedUsers, err := h.service.GetUsers(ctx)
 	if err != nil {
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -74,7 +78,9 @@ func (h *UserHandler) UserLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.service.GetUserByEmail(email)
+	ctx := r.Context()
+
+	user, err := h.service.GetUserByEmail(ctx, email)
 	if err != nil {
 		httpresponses.RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("User not found: %v", err))
 		return
@@ -126,7 +132,10 @@ func (h *UserHandler) GetUserFromCookie(w http.ResponseWriter, r *http.Request) 
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Error parsing userID: %v", err))
 		return
 	}
-	user, err := h.service.GetUserByID(userID)
+
+	ctx := r.Context()
+
+	user, err := h.service.GetUserByID(ctx, userID)
 	if err != nil {
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Error getting user: %v", err))
 		return

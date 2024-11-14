@@ -52,7 +52,9 @@ func (h *PurchasesHandler) CreatePurchase(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	purchase, err := h.service.CreatePurchase(params.ChickenNo, params.ChickenPrice, params.FarmerName, user)
+	ctx := r.Context()
+
+	purchase, err := h.service.CreatePurchase(ctx, params.ChickenNo, params.ChickenPrice, params.FarmerName, user)
 	if err != nil {
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -68,7 +70,10 @@ func (h *PurchasesHandler) GetPurchaseByID(w http.ResponseWriter, r *http.Reques
 		httpresponses.RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("failed to decode request body"))
 		return
 	}
-	purchase, err := h.service.GetPurchaseByID(params.ID)
+
+	ctx := r.Context()
+
+	purchase, err := h.service.GetPurchaseByID(ctx, params.ID)
 	if err != nil {
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -77,7 +82,9 @@ func (h *PurchasesHandler) GetPurchaseByID(w http.ResponseWriter, r *http.Reques
 }
 
 func (h *PurchasesHandler) GetPurchases(w http.ResponseWriter, r *http.Request) {
-	fetchedPurchases, err := h.service.GetPurchases()
+	ctx := r.Context()
+
+	fetchedPurchases, err := h.service.GetPurchases(ctx)
 	if err != nil {
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -93,7 +100,10 @@ func (h *PurchasesHandler) DeletePurchase(w http.ResponseWriter, r *http.Request
 		httpresponses.RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("Could not parse uuid: %s", purchaseIDStr))
 		return
 	}
-	err = h.service.DeletePurchaseByID(purchaseID)
+
+	ctx := r.Context()
+
+	err = h.service.DeletePurchaseByID(ctx, purchaseID)
 	if err != nil {
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return

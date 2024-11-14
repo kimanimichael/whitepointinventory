@@ -20,8 +20,8 @@ func NewUserRepositorySQL(db *sqlcdatabase.Queries) *UserRepositorySql {
 	}
 }
 
-func (r *UserRepositorySql) CreateUser(name, email, password string) (*User, error) {
-	user, err := r.DB.CreateUser(context.Background(), sqlcdatabase.CreateUserParams{
+func (r *UserRepositorySql) CreateUser(ctx context.Context, name, email, password string) (*User, error) {
+	user, err := r.DB.CreateUser(ctx, sqlcdatabase.CreateUserParams{
 		ID:        uuid.New(),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
@@ -42,8 +42,8 @@ func (r *UserRepositorySql) CreateUser(name, email, password string) (*User, err
 	}, nil
 }
 
-func (r *UserRepositorySql) GetUserByID(ID uuid.UUID) (*User, error) {
-	user, err := r.DB.GetUserByID(context.Background(), ID)
+func (r *UserRepositorySql) GetUserByID(ctx context.Context, ID uuid.UUID) (*User, error) {
+	user, err := r.DB.GetUserByID(ctx, ID)
 	if err != nil {
 		return nil, fmt.Errorf("error getting user: %v", err)
 	}
@@ -57,8 +57,8 @@ func (r *UserRepositorySql) GetUserByID(ID uuid.UUID) (*User, error) {
 	}, nil
 }
 
-func (r *UserRepositorySql) GetUserByEmail(email string) (*User, error) {
-	user, err := r.DB.GetUserByEmail(context.Background(), email)
+func (r *UserRepositorySql) GetUserByEmail(ctx context.Context, email string) (*User, error) {
+	user, err := r.DB.GetUserByEmail(ctx, email)
 	if err != nil {
 		return nil, fmt.Errorf("error getting user from email: %v", err)
 	}
@@ -73,8 +73,8 @@ func (r *UserRepositorySql) GetUserByEmail(email string) (*User, error) {
 	}, nil
 }
 
-func (r *UserRepositorySql) GetUserByAPIKey(key string) (*User, error) {
-	user, err := r.DB.GetUserByAPIKey(context.Background(), key)
+func (r *UserRepositorySql) GetUserByAPIKey(ctx context.Context, key string) (*User, error) {
+	user, err := r.DB.GetUserByAPIKey(ctx, key)
 	if err != nil {
 		return nil, fmt.Errorf("error getting user from APIKey: %v", err)
 	}
@@ -89,8 +89,8 @@ func (r *UserRepositorySql) GetUserByAPIKey(key string) (*User, error) {
 	}, nil
 }
 
-func (r *UserRepositorySql) GetUsers() ([]User, error) {
-	users, err := r.DB.GetUsers(context.Background())
+func (r *UserRepositorySql) GetUsers(ctx context.Context) ([]User, error) {
+	users, err := r.DB.GetUsers(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error getting users: %v", err)
 	}

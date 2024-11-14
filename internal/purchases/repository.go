@@ -22,12 +22,12 @@ func NewPurchaseRepositorySQL(db *sqlcdatabase.Queries) *PurchaseRepositorySQL {
 	}
 }
 
-func (r *PurchaseRepositorySQL) CreatePurchase(chickenNo, chickenPrice int32, farmerName string, user *users.User) (*Purchase, error) {
-	farmer, err := r.DB.GetFarmerByName(context.Background(), farmerName)
+func (r *PurchaseRepositorySQL) CreatePurchase(ctx context.Context, chickenNo, chickenPrice int32, farmerName string, user *users.User) (*Purchase, error) {
+	farmer, err := r.DB.GetFarmerByName(ctx, farmerName)
 	if err != nil {
 		return nil, fmt.Errorf("could not get farmer: %w", err)
 	}
-	purchase, err := r.DB.CreatePurchase(context.Background(), sqlcdatabase.CreatePurchaseParams{
+	purchase, err := r.DB.CreatePurchase(ctx, sqlcdatabase.CreatePurchaseParams{
 		ID:              uuid.New(),
 		CreatedAt:       time.Now(),
 		UpdatedAt:       time.Now(),
@@ -43,7 +43,7 @@ func (r *PurchaseRepositorySQL) CreatePurchase(chickenNo, chickenPrice int32, fa
 	var chickenBought sql.NullFloat64
 	chickenBought.Float64 = float64(chickenNo)
 	chickenBought.Valid = true
-	err = r.DB.IncreaseChickenOwed(context.Background(), sqlcdatabase.IncreaseChickenOwedParams{
+	err = r.DB.IncreaseChickenOwed(ctx, sqlcdatabase.IncreaseChickenOwedParams{
 		ChickenBalance: chickenBought,
 		ID:             farmer.ID,
 	})
@@ -54,7 +54,7 @@ func (r *PurchaseRepositorySQL) CreatePurchase(chickenNo, chickenPrice int32, fa
 	var cashBalance sql.NullInt32
 	cashBalance.Int32 = chickenNo * chickenPrice
 	cashBalance.Valid = true
-	err = r.DB.IncreaseCashOwed(context.Background(), sqlcdatabase.IncreaseCashOwedParams{
+	err = r.DB.IncreaseCashOwed(ctx, sqlcdatabase.IncreaseCashOwedParams{
 		CashBalance: cashBalance,
 		ID:          farmer.ID,
 	})
@@ -62,14 +62,14 @@ func (r *PurchaseRepositorySQL) CreatePurchase(chickenNo, chickenPrice int32, fa
 		_ = fmt.Errorf("couldn't decrease chicken owed: %v", err)
 	}
 
-	if err = r.DB.MarkFarmerAsUpdated(context.Background(), farmer.ID); err != nil {
+	if err = r.DB.MarkFarmerAsUpdated(ctx, farmer.ID); err != nil {
 		fmt.Printf("Could not mark farmer as updated: %v\n", err)
 	}
 	if err == nil {
 		fmt.Printf("Farmer %v updated at %v\n", farmer.Name, time.Now())
 	}
 
-	updatedFarmer, err := r.DB.GetFarmerByName(context.Background(), farmerName)
+	updatedFarmer, err := r.DB.GetFarmerByName(ctx, farmerName)
 	if err != nil {
 		_ = fmt.Errorf("couldn't get farmer by name: %v", err)
 	}
@@ -89,8 +89,8 @@ func (r *PurchaseRepositorySQL) CreatePurchase(chickenNo, chickenPrice int32, fa
 	}, nil
 }
 
-func (r *PurchaseRepositorySQL) GetPurchaseByID(ID uuid.UUID) (*Purchase, error) {
-	purchase, err := r.DB.GetPurchaseByID(context.Background(), ID)
+func (r *PurchaseRepositorySQL) GetPurchaseByID(ctx context.Context, ID uuid.UUID) (*Purchase, error) {
+	purchase, err := r.DB.GetPurchaseByID(ctx, ID)
 	if err != nil {
 		return nil, fmt.Errorf("error getting purchase ID: %v", err)
 	}
@@ -105,13 +105,13 @@ func (r *PurchaseRepositorySQL) GetPurchaseByID(ID uuid.UUID) (*Purchase, error)
 	}, nil
 }
 
-func (r *PurchaseRepositorySQL) GetMostRecentPurchase() (*Purchase, error) {
-	purchase, err := r.DB.GetMostRecentPurchase(context.Background())
+func (r *PurchaseRepositorySQL) GetMostRecentPurchase(ctx context.Context) (*Purchase, error) {
+	purchase, err := r.DB.GetMostRecentPurchase(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error getting most recent purchase: %v", err)
 	}
 
-	farmer, err := r.DB.GetFarmerByID(context.Background(), purchase.FarmerID)
+	farmer, err := r.DB.GetFarmerByID(ctx, purchase.FarmerID)
 	if err != nil {
 		return nil, fmt.Errorf("error getting farmer from most recent purchase: %v", err)
 	}
@@ -127,8 +127,8 @@ func (r *PurchaseRepositorySQL) GetMostRecentPurchase() (*Purchase, error) {
 	}, nil
 }
 
-func (r *PurchaseRepositorySQL) GetPurchases() ([]Purchase, error) {
-	purchases, err := r.DB.GetPurchases(context.Background())
+func (r *PurchaseRepositorySQL) GetPurchases(ctx context.Context) ([]Purchase, error) {
+	purchases, err := r.DB.GetPurchases(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error getting purchases: %v", err)
 	}
@@ -144,12 +144,12 @@ func (r *PurchaseRepositorySQL) GetPurchases() ([]Purchase, error) {
 			PricePerChicken: purchase.PricePerChicken,
 			FarmerID:        purchase.FarmerID,
 		}
-		user, err := r.DB.GetUserByID(context.Background(), purchase.UserID)
+		user, err := r.DB.GetUserByID(ctx, purchase.UserID)
 		if err != nil {
 			return nil, fmt.Errorf("error getting user from purchase: %v", err)
 		}
 		purchaseWithName.UserName = user.Name
-		farmer, err := r.DB.GetFarmerByID(context.Background(), purchaseWithName.FarmerID)
+		farmer, err := r.DB.GetFarmerByID(ctx, purchaseWithName.FarmerID)
 		if err != nil {
 			return nil, fmt.Errorf("error getting farmer from purchase: %v", err)
 		}
@@ -163,11 +163,11 @@ func (r *PurchaseRepositorySQL) GetPurchases() ([]Purchase, error) {
 	return purchasesToReturn, nil
 }
 
-func (r *PurchaseRepositorySQL) DeletePurchase(ID uuid.UUID) error {
+func (r *PurchaseRepositorySQL) DeletePurchase(ctx context.Context, ID uuid.UUID) error {
 	cashBalance := sql.NullInt32{}
 	chickenBalance := sql.NullFloat64{}
 
-	purchase, err := r.DB.GetPurchaseByID(context.Background(), ID)
+	purchase, err := r.DB.GetPurchaseByID(ctx, ID)
 	if err != nil {
 		return fmt.Errorf("error getting purchase from ID: %v", err)
 	}
@@ -176,21 +176,21 @@ func (r *PurchaseRepositorySQL) DeletePurchase(ID uuid.UUID) error {
 	cashBalance.Int32 = purchase.Chicken * purchase.PricePerChicken
 	cashBalance.Valid = true
 
-	err = r.DB.DecreaseCashOwed(context.Background(), sqlcdatabase.DecreaseCashOwedParams{
+	err = r.DB.DecreaseCashOwed(ctx, sqlcdatabase.DecreaseCashOwedParams{
 		CashBalance: cashBalance,
 		ID:          purchase.FarmerID,
 	})
 	if err != nil {
 		return fmt.Errorf("couldn't decrease cash owed: %v", err)
 	}
-	err = r.DB.DecreaseChickenOwed(context.Background(), sqlcdatabase.DecreaseChickenOwedParams{
+	err = r.DB.DecreaseChickenOwed(ctx, sqlcdatabase.DecreaseChickenOwedParams{
 		ChickenBalance: chickenBalance,
 		ID:             purchase.FarmerID,
 	})
 	if err != nil {
 		return fmt.Errorf("couldn't decrease chicken owed: %v", err)
 	}
-	err = r.DB.DeletePurchase(context.Background(), ID)
+	err = r.DB.DeletePurchase(ctx, ID)
 	if err != nil {
 		return fmt.Errorf("couldn't delete purchase: %v", err)
 	}

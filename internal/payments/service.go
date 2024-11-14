@@ -1,6 +1,7 @@
 package payments
 
 import (
+	"context"
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/mike-kimani/whitepointinventory/internal/users"
@@ -37,7 +38,7 @@ func NewPaymentsService(repo PaymentsRepository) PaymentsService {
 	}
 }
 
-func (s *paymentsService) CreatePayment(cashPaid, chickenPrice int32, farmerName string, user *users.User) (*Payment, error) {
+func (s *paymentsService) CreatePayment(ctx context.Context, cashPaid, chickenPrice int32, farmerName string, user *users.User) (*Payment, error) {
 	if cashPaid < MinCashPaid || cashPaid > MaxCashPaid {
 		return nil, fmt.Errorf("cash paid must be between %d and %d", MinCashPaid, MaxCashPaid)
 	}
@@ -45,7 +46,7 @@ func (s *paymentsService) CreatePayment(cashPaid, chickenPrice int32, farmerName
 		return nil, fmt.Errorf("chicken price must be within %d and %d", MinChickenPrice, MaxChickenPrice)
 	}
 
-	mostRecentPayment, err := s.repo.GetMostRecentPayment()
+	mostRecentPayment, err := s.repo.GetMostRecentPayment(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +74,7 @@ func (s *paymentsService) CreatePayment(cashPaid, chickenPrice int32, farmerName
 		}
 	}
 
-	payment, err := s.repo.CreatePayment(cashPaid, chickenPrice, farmerName, user)
+	payment, err := s.repo.CreatePayment(ctx, cashPaid, chickenPrice, farmerName, user)
 	if err != nil {
 		return nil, err
 	}
@@ -81,24 +82,24 @@ func (s *paymentsService) CreatePayment(cashPaid, chickenPrice int32, farmerName
 	return payment, nil
 }
 
-func (s *paymentsService) GetPaymentByID(ID uuid.UUID) (*Payment, error) {
-	payment, err := s.repo.GetPaymentByID(ID)
+func (s *paymentsService) GetPaymentByID(ctx context.Context, ID uuid.UUID) (*Payment, error) {
+	payment, err := s.repo.GetPaymentByID(ctx, ID)
 	if err != nil {
 		return nil, err
 	}
 	return payment, nil
 }
 
-func (s *paymentsService) GetPayments() ([]Payment, error) {
-	payments, err := s.repo.GetPayments()
+func (s *paymentsService) GetPayments(ctx context.Context) ([]Payment, error) {
+	payments, err := s.repo.GetPayments(ctx)
 	if err != nil {
 		return nil, err
 	}
 	return payments, nil
 }
 
-func (s *paymentsService) DeletePaymentByID(ID uuid.UUID) error {
-	err := s.repo.DeletePayment(ID)
+func (s *paymentsService) DeletePaymentByID(ctx context.Context, ID uuid.UUID) error {
+	err := s.repo.DeletePayment(ctx, ID)
 	if err != nil {
 		return err
 	}

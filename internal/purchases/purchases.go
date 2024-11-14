@@ -1,6 +1,7 @@
 package purchases
 
 import (
+	"context"
 	"github.com/google/uuid"
 	"github.com/mike-kimani/whitepointinventory/internal/users"
 	"time"
@@ -21,16 +22,16 @@ type Purchase struct {
 }
 
 type PurchaseRepository interface {
-	CreatePurchase(chickenNo int32, chickenPrice int32, farmerName string, user *users.User) (*Purchase, error)
-	GetPurchaseByID(ID uuid.UUID) (*Purchase, error)
-	GetMostRecentPurchase() (*Purchase, error)
-	GetPurchases() ([]Purchase, error)
-	DeletePurchase(ID uuid.UUID) error
+	CreatePurchase(ctx context.Context, chickenNo int32, chickenPrice int32, farmerName string, user *users.User) (*Purchase, error)
+	GetPurchaseByID(ctx context.Context, ID uuid.UUID) (*Purchase, error)
+	GetMostRecentPurchase(ctx context.Context) (*Purchase, error)
+	GetPurchases(ctx context.Context) ([]Purchase, error)
+	DeletePurchase(ctx context.Context, ID uuid.UUID) error
 }
 
 type PurchaseService interface {
-	CreatePurchase(chickenNo int32, chickenPrice int32, farmerName string, user *users.User) (*Purchase, error)
-	GetPurchaseByID(ID uuid.UUID) (*Purchase, error)
-	GetPurchases() ([]Purchase, error)
-	DeletePurchaseByID(ID uuid.UUID) error
+	CreatePurchase(ctx context.Context, chickenNo int32, chickenPrice int32, farmerName string, user *users.User) (*Purchase, error)
+	GetPurchaseByID(ctx context.Context, ID uuid.UUID) (*Purchase, error)
+	GetPurchases(ctx context.Context) ([]Purchase, error)
+	DeletePurchaseByID(ctx context.Context, ID uuid.UUID) error
 }

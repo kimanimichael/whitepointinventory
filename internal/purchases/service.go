@@ -1,6 +1,7 @@
 package purchases
 
 import (
+	"context"
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/mike-kimani/whitepointinventory/internal/users"
@@ -31,7 +32,7 @@ func NewPurchaseService(repo PurchaseRepository) PurchaseService {
 	}
 }
 
-func (s *purchaseService) CreatePurchase(chickenNo, chickenPrice int32, farmerName string, user *users.User) (*Purchase, error) {
+func (s *purchaseService) CreatePurchase(ctx context.Context, chickenNo, chickenPrice int32, farmerName string, user *users.User) (*Purchase, error) {
 	if chickenNo < MinChickenNumber || chickenNo > MaxChickenNumber {
 		return nil, fmt.Errorf("chicken number must be within %d and %d", MinChickenNumber, MaxChickenNumber)
 	}
@@ -39,7 +40,7 @@ func (s *purchaseService) CreatePurchase(chickenNo, chickenPrice int32, farmerNa
 	if chickenPrice < MinChickenPrice || chickenPrice > MaxChickenPrice {
 		return nil, fmt.Errorf("chicken price must be within %d and %d", MinChickenPrice, MaxChickenPrice)
 	}
-	mostRecentPurchase, err := s.repo.GetMostRecentPurchase()
+	mostRecentPurchase, err := s.repo.GetMostRecentPurchase(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -67,31 +68,31 @@ func (s *purchaseService) CreatePurchase(chickenNo, chickenPrice int32, farmerNa
 		}
 	}
 
-	purchase, err := s.repo.CreatePurchase(chickenNo, chickenPrice, farmerName, user)
+	purchase, err := s.repo.CreatePurchase(ctx, chickenNo, chickenPrice, farmerName, user)
 	if err != nil {
 		return nil, err
 	}
 	return purchase, nil
 }
 
-func (s *purchaseService) GetPurchaseByID(ID uuid.UUID) (*Purchase, error) {
-	purchase, err := s.repo.GetPurchaseByID(ID)
+func (s *purchaseService) GetPurchaseByID(ctx context.Context, ID uuid.UUID) (*Purchase, error) {
+	purchase, err := s.repo.GetPurchaseByID(ctx, ID)
 	if err != nil {
 		return nil, err
 	}
 	return purchase, nil
 }
 
-func (s *purchaseService) GetPurchases() ([]Purchase, error) {
-	purchases, err := s.repo.GetPurchases()
+func (s *purchaseService) GetPurchases(ctx context.Context) ([]Purchase, error) {
+	purchases, err := s.repo.GetPurchases(ctx)
 	if err != nil {
 		return nil, err
 	}
 	return purchases, nil
 }
 
-func (s *purchaseService) DeletePurchaseByID(ID uuid.UUID) error {
-	err := s.repo.DeletePurchase(ID)
+func (s *purchaseService) DeletePurchaseByID(ctx context.Context, ID uuid.UUID) error {
+	err := s.repo.DeletePurchase(ctx, ID)
 	if err != nil {
 		return err
 	}

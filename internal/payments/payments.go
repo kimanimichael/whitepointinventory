@@ -1,6 +1,7 @@
 package payments
 
 import (
+	"context"
 	"github.com/google/uuid"
 	"github.com/mike-kimani/whitepointinventory/internal/users"
 	"time"
@@ -21,16 +22,16 @@ type Payment struct {
 }
 
 type PaymentsService interface {
-	CreatePayment(cashPaid, chickenPrice int32, farmerName string, user *users.User) (*Payment, error)
-	GetPaymentByID(ID uuid.UUID) (*Payment, error)
-	GetPayments() ([]Payment, error)
-	DeletePaymentByID(ID uuid.UUID) error
+	CreatePayment(ctx context.Context, cashPaid, chickenPrice int32, farmerName string, user *users.User) (*Payment, error)
+	GetPaymentByID(ctx context.Context, ID uuid.UUID) (*Payment, error)
+	GetPayments(ctx context.Context) ([]Payment, error)
+	DeletePaymentByID(ctx context.Context, ID uuid.UUID) error
 }
 
 type PaymentsRepository interface {
-	CreatePayment(cashPaid, chickenPrice int32, farmerName string, user *users.User) (*Payment, error)
-	GetPaymentByID(ID uuid.UUID) (*Payment, error)
-	GetMostRecentPayment() (*Payment, error)
-	GetPayments() ([]Payment, error)
-	DeletePayment(ID uuid.UUID) error
+	CreatePayment(ctx context.Context, cashPaid, chickenPrice int32, farmerName string, user *users.User) (*Payment, error)
+	GetPaymentByID(ctx context.Context, ID uuid.UUID) (*Payment, error)
+	GetMostRecentPayment(ctx context.Context) (*Payment, error)
+	GetPayments(ctx context.Context) ([]Payment, error)
+	DeletePayment(ctx context.Context, ID uuid.UUID) error
 }

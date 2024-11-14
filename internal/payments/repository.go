@@ -20,12 +20,12 @@ func NewPaymentsRepositorySQL(DB *sqlcdatabase.Queries) *PaymentRepositorySql {
 	return &PaymentRepositorySql{DB: DB}
 }
 
-func (r *PaymentRepositorySql) CreatePayment(cashPaid, chickenPrice int32, farmerName string, user *users.User) (*Payment, error) {
-	farmer, err := r.DB.GetFarmerByName(context.Background(), farmerName)
+func (r *PaymentRepositorySql) CreatePayment(ctx context.Context, cashPaid, chickenPrice int32, farmerName string, user *users.User) (*Payment, error) {
+	farmer, err := r.DB.GetFarmerByName(ctx, farmerName)
 	if err != nil {
 		return nil, fmt.Errorf("error getting farmer: %v", err)
 	}
-	payment, err := r.DB.CreatePayment(context.Background(), sqlcdatabase.CreatePaymentParams{
+	payment, err := r.DB.CreatePayment(ctx, sqlcdatabase.CreatePaymentParams{
 		ID:                  uuid.New(),
 		CreatedAt:           time.Now(),
 		UpdatedAt:           time.Now(),
@@ -46,14 +46,14 @@ func (r *PaymentRepositorySql) CreatePayment(cashPaid, chickenPrice int32, farme
 	chickenBalance.Float64 = float64(cashPaid) / float64(chickenPrice)
 	chickenBalance.Valid = true
 
-	err = r.DB.DecreaseChickenOwed(context.Background(), sqlcdatabase.DecreaseChickenOwedParams{
+	err = r.DB.DecreaseChickenOwed(ctx, sqlcdatabase.DecreaseChickenOwedParams{
 		ChickenBalance: chickenBalance,
 		ID:             farmer.ID,
 	})
 	if err != nil {
 		_ = fmt.Errorf("couldn't decrease chicken owed: %v", err)
 	}
-	err = r.DB.DecreaseCashOwed(context.Background(), sqlcdatabase.DecreaseCashOwedParams{
+	err = r.DB.DecreaseCashOwed(ctx, sqlcdatabase.DecreaseCashOwedParams{
 		CashBalance: cashBalance,
 		ID:          farmer.ID,
 	})
@@ -61,11 +61,11 @@ func (r *PaymentRepositorySql) CreatePayment(cashPaid, chickenPrice int32, farme
 		_ = fmt.Errorf("couldn't decrease cash owed: %v", err)
 	}
 
-	err = r.DB.MarkFarmerAsUpdated(context.Background(), farmer.ID)
+	err = r.DB.MarkFarmerAsUpdated(ctx, farmer.ID)
 	if err != nil {
 		_ = fmt.Errorf("couldn't mark farmer as updated: %v", err)
 	}
-	updatedFarmer, err := r.DB.GetFarmerByName(context.Background(), farmerName)
+	updatedFarmer, err := r.DB.GetFarmerByName(ctx, farmerName)
 	if err != nil {
 		_ = fmt.Errorf("couldn't get farmer by name: %v", err)
 	}
@@ -88,8 +88,8 @@ func (r *PaymentRepositorySql) CreatePayment(cashPaid, chickenPrice int32, farme
 	}, nil
 }
 
-func (r *PaymentRepositorySql) GetPaymentByID(ID uuid.UUID) (*Payment, error) {
-	payment, err := r.DB.GetPaymentByID(context.Background(), ID)
+func (r *PaymentRepositorySql) GetPaymentByID(ctx context.Context, ID uuid.UUID) (*Payment, error) {
+	payment, err := r.DB.GetPaymentByID(ctx, ID)
 	if err != nil {
 		return nil, fmt.Errorf("error getting payment from ID: %v", err)
 	}
@@ -104,12 +104,12 @@ func (r *PaymentRepositorySql) GetPaymentByID(ID uuid.UUID) (*Payment, error) {
 	}, nil
 }
 
-func (r *PaymentRepositorySql) GetMostRecentPayment() (*Payment, error) {
-	payment, err := r.DB.GetMostRecentPayment(context.Background())
+func (r *PaymentRepositorySql) GetMostRecentPayment(ctx context.Context) (*Payment, error) {
+	payment, err := r.DB.GetMostRecentPayment(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error getting most recent payment: %v", err)
 	}
-	farmer, err := r.DB.GetFarmerByID(context.Background(), payment.FarmerID)
+	farmer, err := r.DB.GetFarmerByID(ctx, payment.FarmerID)
 	if err != nil {
 		return nil, fmt.Errorf("error getting farmer from most recent purchase: %v", err)
 	}
@@ -127,20 +127,20 @@ func (r *PaymentRepositorySql) GetMostRecentPayment() (*Payment, error) {
 
 }
 
-func (r *PaymentRepositorySql) GetPayments() ([]Payment, error) {
+func (r *PaymentRepositorySql) GetPayments(ctx context.Context) ([]Payment, error) {
 	var paymentResponse []Payment
 
-	payments, err := r.DB.GetPayments(context.Background())
+	payments, err := r.DB.GetPayments(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error getting payments: %v", err)
 	}
 
 	for _, payment := range payments {
-		user, err := r.DB.GetUserByID(context.Background(), payment.UserID)
+		user, err := r.DB.GetUserByID(ctx, payment.UserID)
 		if err != nil {
 			return nil, fmt.Errorf("error getting user from payment: %v", err)
 		}
-		farmer, err := r.DB.GetFarmerByID(context.Background(), payment.FarmerID)
+		farmer, err := r.DB.GetFarmerByID(ctx, payment.FarmerID)
 		if err != nil {
 			return nil, fmt.Errorf("error getting farmer from payment: %v", err)
 		}
@@ -161,10 +161,10 @@ func (r *PaymentRepositorySql) GetPayments() ([]Payment, error) {
 	return paymentResponse, nil
 }
 
-func (r *PaymentRepositorySql) DeletePayment(ID uuid.UUID) error {
+func (r *PaymentRepositorySql) DeletePayment(ctx context.Context, ID uuid.UUID) error {
 	cashBalance := sql.NullInt32{}
 	chickenBalance := sql.NullFloat64{}
-	payment, err := r.DB.GetPaymentByID(context.Background(), ID)
+	payment, err := r.DB.GetPaymentByID(ctx, ID)
 	if err != nil {
 		return fmt.Errorf("error getting payment from ID: %v", err)
 	}
@@ -173,21 +173,21 @@ func (r *PaymentRepositorySql) DeletePayment(ID uuid.UUID) error {
 	chickenBalance.Float64 = float64(payment.CashPaid) / float64(payment.PricePerChickenPaid)
 	chickenBalance.Valid = true
 
-	err = r.DB.IncreaseCashOwed(context.Background(), sqlcdatabase.IncreaseCashOwedParams{
+	err = r.DB.IncreaseCashOwed(ctx, sqlcdatabase.IncreaseCashOwedParams{
 		CashBalance: cashBalance,
 		ID:          payment.FarmerID,
 	})
 	if err != nil {
 		return fmt.Errorf("error increasing cash owed: %v", err)
 	}
-	err = r.DB.IncreaseChickenOwed(context.Background(), sqlcdatabase.IncreaseChickenOwedParams{
+	err = r.DB.IncreaseChickenOwed(ctx, sqlcdatabase.IncreaseChickenOwedParams{
 		ChickenBalance: chickenBalance,
 		ID:             payment.FarmerID,
 	})
 	if err != nil {
 		return fmt.Errorf("error increasing chicken owed: %v", err)
 	}
-	err = r.DB.DeletePayments(context.Background(), ID)
+	err = r.DB.DeletePayments(ctx, ID)
 	if err != nil {
 		return fmt.Errorf("error deleting payment: %v", err)
 	}

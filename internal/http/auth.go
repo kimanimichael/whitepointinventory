@@ -21,7 +21,8 @@ func (a *UserAuth) MiddlewareAuth(handler authedHandler) http.HandlerFunc {
 			httpresponses.RespondWithError(w, 400, fmt.Sprintf("Auth error: %v", err))
 			return
 		}
-		user, err := a.Service.GetUserByAPIKey(apiKey)
+		ctx := r.Context()
+		user, err := a.Service.GetUserByAPIKey(ctx, apiKey)
 
 		if err != nil {
 			httpresponses.RespondWithError(w, 400, fmt.Sprintf("Couldn't get user: %v", err))

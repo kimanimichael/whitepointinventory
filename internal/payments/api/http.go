@@ -50,8 +50,9 @@ func (h *PaymentsHandler) CreatePayment(w http.ResponseWriter, r *http.Request, 
 		httpresponses.RespondWithError(w, http.StatusBadRequest, "Both Cash paid and chicken price are required")
 		return
 	}
+	ctx := r.Context()
 
-	payment, err := h.service.CreatePayment(params.CashPaid, params.ChickenPrice, params.FarmerName, user)
+	payment, err := h.service.CreatePayment(ctx, params.CashPaid, params.ChickenPrice, params.FarmerName, user)
 	if err != nil {
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -69,7 +70,9 @@ func (h *PaymentsHandler) GetPaymentByID(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	payment, err := h.service.GetPaymentByID(params.ID)
+	ctx := r.Context()
+
+	payment, err := h.service.GetPaymentByID(ctx, params.ID)
 	if err != nil {
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -78,7 +81,9 @@ func (h *PaymentsHandler) GetPaymentByID(w http.ResponseWriter, r *http.Request)
 }
 
 func (h *PaymentsHandler) GetPayments(w http.ResponseWriter, r *http.Request) {
-	payments, err := h.service.GetPayments()
+	ctx := r.Context()
+
+	payments, err := h.service.GetPayments(ctx)
 	if err != nil {
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -94,7 +99,10 @@ func (h *PaymentsHandler) DeletePayment(w http.ResponseWriter, r *http.Request, 
 		httpresponses.RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("Could not parse uuid: %s", paymentIDStr))
 		return
 	}
-	err = h.service.DeletePaymentByID(paymentID)
+
+	ctx := r.Context()
+
+	err = h.service.DeletePaymentByID(ctx, paymentID)
 	if err != nil {
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
