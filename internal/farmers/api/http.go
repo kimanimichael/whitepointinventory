@@ -59,7 +59,10 @@ func (h *FarmerHandler) GetFarmerByName(w http.ResponseWriter, r *http.Request) 
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Could not decode parameters :%v", err))
 		return
 	}
-	farmer, err := h.service.GetFarmerByName(params.Name)
+
+	ctx := r.Context()
+
+	farmer, err := h.service.GetFarmerByName(ctx, params.Name)
 	if err != nil {
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Could not get farmer :%v", err))
 		return
@@ -68,7 +71,9 @@ func (h *FarmerHandler) GetFarmerByName(w http.ResponseWriter, r *http.Request) 
 }
 
 func (h *FarmerHandler) GetFarmers(w http.ResponseWriter, r *http.Request) {
-	fetchedFarmers, err := h.service.GetFarmers()
+	ctx := r.Context()
+
+	fetchedFarmers, err := h.service.GetFarmers(ctx)
 	if err != nil {
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Could not get fetchedFarmers :%v", err))
 		return
@@ -84,7 +89,10 @@ func (h *FarmerHandler) DeleteFarmerByID(w http.ResponseWriter, r *http.Request)
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Could not parse farmerID :%v", err))
 		return
 	}
-	err = h.service.DeleteFarmerByID(farmerID)
+
+	ctx := r.Context()
+
+	err = h.service.DeleteFarmerByID(ctx, farmerID)
 	if err != nil {
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Could not delete farmer :%v", err))
 		return

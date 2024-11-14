@@ -30,8 +30,8 @@ func (s *farmerService) CreateFarmer(ctx context.Context, name string, chickenBa
 	}, nil
 }
 
-func (s *farmerService) GetFarmerByName(name string) (*Farmer, error) {
-	farmer, err := s.repo.GetFarmerByName(name)
+func (s *farmerService) GetFarmerByName(ctx context.Context, name string) (*Farmer, error) {
+	farmer, err := s.repo.GetFarmerByName(ctx, name)
 	if err != nil {
 		return nil, err
 	}
@@ -45,8 +45,8 @@ func (s *farmerService) GetFarmerByName(name string) (*Farmer, error) {
 	}, nil
 }
 
-func (s *farmerService) GetFarmers() ([]Farmer, error) {
-	farmers, err := s.repo.GetFarmers()
+func (s *farmerService) GetFarmers(ctx context.Context) ([]Farmer, error) {
+	farmers, err := s.repo.GetFarmers(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -54,8 +54,8 @@ func (s *farmerService) GetFarmers() ([]Farmer, error) {
 	return farmers, nil
 }
 
-func (s *farmerService) DeleteFarmerByID(ID uuid.UUID) error {
-	err := s.repo.DeleteFarmerByID(ID)
+func (s *farmerService) DeleteFarmerByID(ctx context.Context, ID uuid.UUID) error {
+	err := s.repo.DeleteFarmerByID(ctx, ID)
 	if err != nil {
 		return err
 	}

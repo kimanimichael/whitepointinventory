@@ -18,14 +18,14 @@ type Farmer struct {
 
 type FarmerService interface {
 	CreateFarmer(ctx context.Context, name string, chickenBalance float64, cashBalance int32) (*Farmer, error)
-	GetFarmerByName(name string) (*Farmer, error)
-	GetFarmers() ([]Farmer, error)
-	DeleteFarmerByID(ID uuid.UUID) error
+	GetFarmerByName(ctx context.Context, name string) (*Farmer, error)
+	GetFarmers(ctx context.Context) ([]Farmer, error)
+	DeleteFarmerByID(ctx context.Context, ID uuid.UUID) error
 }
 
 type FarmerRepository interface {
 	CreateFarmer(ctx context.Context, name string, chickenBalance float64, cashBalance int32) (*Farmer, error)
-	GetFarmerByName(string) (*Farmer, error)
-	GetFarmers() ([]Farmer, error)
-	DeleteFarmerByID(ID uuid.UUID) error
+	GetFarmerByName(ctx context.Context, name string) (*Farmer, error)
+	GetFarmers(ctx context.Context) ([]Farmer, error)
+	DeleteFarmerByID(ctx context.Context, ID uuid.UUID) error
 }

@@ -51,8 +51,8 @@ func (r *FarmerRepositorySQL) CreateFarmer(ctx context.Context, name string, chi
 	}, nil
 }
 
-func (r *FarmerRepositorySQL) GetFarmerByName(name string) (*Farmer, error) {
-	farmer, err := r.DB.GetFarmerByName(context.Background(), name)
+func (r *FarmerRepositorySQL) GetFarmerByName(ctx context.Context, name string) (*Farmer, error) {
+	farmer, err := r.DB.GetFarmerByName(ctx, name)
 	if err != nil {
 		return nil, fmt.Errorf("error getting farmer: %v", err)
 	}
@@ -66,8 +66,8 @@ func (r *FarmerRepositorySQL) GetFarmerByName(name string) (*Farmer, error) {
 	}, nil
 }
 
-func (r *FarmerRepositorySQL) GetFarmers() ([]Farmer, error) {
-	farmers, err := r.DB.GetFarmers(context.Background())
+func (r *FarmerRepositorySQL) GetFarmers(ctx context.Context) ([]Farmer, error) {
+	farmers, err := r.DB.GetFarmers(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error creating farmers: %v", err)
 	}
@@ -85,8 +85,8 @@ func (r *FarmerRepositorySQL) GetFarmers() ([]Farmer, error) {
 	return farmersToReturn, nil
 }
 
-func (r *FarmerRepositorySQL) DeleteFarmerByID(ID uuid.UUID) error {
-	err := r.DB.DeleteFarmers(context.Background(), ID)
+func (r *FarmerRepositorySQL) DeleteFarmerByID(ctx context.Context, ID uuid.UUID) error {
+	err := r.DB.DeleteFarmers(ctx, ID)
 	if err != nil {
 		return fmt.Errorf("error deleting farmer: %v", err)
 	}
