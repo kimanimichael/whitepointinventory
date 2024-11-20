@@ -35,6 +35,12 @@ SELECT * FROM farmers where id = $1;
 -- name: GetFarmers :many
 SELECT * FROM farmers ORDER BY updated_at DESC;
 
+-- name: GetPagedFarmers :many
+SELECT * FROM farmers OFFSET $1 LIMIT $2;
+
+-- name: GetFarmerCount :one
+SELECT COUNT(*) AS total FROM farmers;
+
 -- name: MarkFarmerAsUpdated :exec
 UPDATE farmers
 SET updated_at = NOW()

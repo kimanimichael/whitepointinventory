@@ -85,6 +85,38 @@ func (r *FarmerRepositorySQL) GetFarmers(ctx context.Context) ([]Farmer, error) 
 	return farmersToReturn, nil
 }
 
+func (r *FarmerRepositorySQL) GetPagedFarmers(ctx context.Context, offset, limit uint32) (*FarmersPage, error) {
+	farmers, err := r.DB.GetPagedFarmers(ctx, sqlcdatabase.GetPagedFarmersParams{
+		Offset: int32(offset),
+		Limit:  int32(limit),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("error creating farmers: %v", err)
+	}
+	total, err := r.DB.GetFarmerCount(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("error getting farmer count: %v", err)
+	}
+	var farmersToReturn []Farmer
+	for _, farmer := range farmers {
+		farmersToReturn = append(farmersToReturn, Farmer{
+			ID:             farmer.ID,
+			CreatedAt:      farmer.CreatedAt,
+			UpdatedAt:      farmer.UpdatedAt,
+			Name:           farmer.Name,
+			ChickenBalance: farmer.ChickenBalance.Float64,
+			CashBalance:    farmer.CashBalance.Int32,
+		})
+	}
+	page := &FarmersPage{
+		Page: Page{Offset: offset,
+			Total: uint32(total),
+		},
+		Farmers: farmersToReturn,
+	}
+	return page, nil
+}
+
 func (r *FarmerRepositorySQL) DeleteFarmerByID(ctx context.Context, ID uuid.UUID) error {
 	err := r.DB.DeleteFarmers(ctx, ID)
 	if err != nil {

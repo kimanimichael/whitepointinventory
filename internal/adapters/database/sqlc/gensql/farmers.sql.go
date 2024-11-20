@@ -126,12 +126,62 @@ func (q *Queries) GetFarmerByName(ctx context.Context, name string) (Farmer, err
 	return i, err
 }
 
+const getFarmerCount = `-- name: GetFarmerCount :one
+SELECT COUNT(*) AS total FROM farmers
+`
+
+func (q *Queries) GetFarmerCount(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getFarmerCount)
+	var total int64
+	err := row.Scan(&total)
+	return total, err
+}
+
 const getFarmers = `-- name: GetFarmers :many
 SELECT id, created_at, updated_at, name, chicken_balance, cash_balance FROM farmers ORDER BY updated_at DESC
 `
 
 func (q *Queries) GetFarmers(ctx context.Context) ([]Farmer, error) {
 	rows, err := q.db.QueryContext(ctx, getFarmers)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Farmer
+	for rows.Next() {
+		var i Farmer
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Name,
+			&i.ChickenBalance,
+			&i.CashBalance,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getPagedFarmers = `-- name: GetPagedFarmers :many
+SELECT id, created_at, updated_at, name, chicken_balance, cash_balance FROM farmers OFFSET $1 LIMIT $2
+`
+
+type GetPagedFarmersParams struct {
+	Offset int32
+	Limit  int32
+}
+
+func (q *Queries) GetPagedFarmers(ctx context.Context, arg GetPagedFarmersParams) ([]Farmer, error) {
+	rows, err := q.db.QueryContext(ctx, getPagedFarmers, arg.Offset, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
