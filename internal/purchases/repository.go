@@ -163,6 +163,50 @@ func (r *PurchaseRepositorySQL) GetPurchases(ctx context.Context) ([]Purchase, e
 	return purchasesToReturn, nil
 }
 
+func (r *PurchaseRepositorySQL) GetPagedPurchases(ctx context.Context, offset, limit uint32) (*PurchasePage, error) {
+	purchases, err := r.DB.GetPagedPurchases(ctx, sqlcdatabase.GetPagedPurchasesParams{
+		Offset: int32(offset),
+		Limit:  int32(limit),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("error getting paged purchases: %v", err)
+	}
+
+	var purchasesToReturn []Purchase
+	for _, purchase := range purchases {
+		user, err := r.DB.GetUserByID(ctx, purchase.UserID)
+		if err != nil {
+			return nil, fmt.Errorf("error getting user from purchase: %v", err)
+		}
+		farmer, err := r.DB.GetFarmerByID(ctx, purchase.FarmerID)
+		if err != nil {
+			return nil, fmt.Errorf("error getting farmer from purchase: %v", err)
+		}
+		purchasesToReturn = append(purchasesToReturn, Purchase{
+			ID:                   purchase.ID,
+			CreatedAt:            purchase.CreatedAt,
+			UpdatedAt:            purchase.UpdatedAt,
+			Chicken:              purchase.Chicken,
+			PricePerChicken:      purchase.PricePerChicken,
+			FarmerID:             purchase.FarmerID,
+			UserName:             user.Name,
+			FarmerName:           farmer.Name,
+			FarmerChickenBalance: farmer.ChickenBalance.Float64,
+			FarmerCashBalance:    farmer.CashBalance.Int32,
+		})
+	}
+
+	totalPurchases, err := r.DB.GetPurchasesCount(ctx)
+	returnedPage := &PurchasePage{
+		page: page{
+			Offset: offset,
+			Total:  uint32(totalPurchases),
+		},
+		Purchases: purchasesToReturn,
+	}
+	return returnedPage, nil
+}
+
 func (r *PurchaseRepositorySQL) DeletePurchase(ctx context.Context, ID uuid.UUID) error {
 	cashBalance := sql.NullInt32{}
 	chickenBalance := sql.NullFloat64{}

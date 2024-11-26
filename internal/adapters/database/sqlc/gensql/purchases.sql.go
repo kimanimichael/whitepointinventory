@@ -82,6 +82,47 @@ func (q *Queries) GetMostRecentPurchase(ctx context.Context) (Purchase, error) {
 	return i, err
 }
 
+const getPagedPurchases = `-- name: GetPagedPurchases :many
+SELECT id, created_at, updated_at, chicken, price_per_chicken, user_id, farmer_id FROM purchases ORDER BY created_at DESC
+OFFSET $1 LIMIT $2
+`
+
+type GetPagedPurchasesParams struct {
+	Offset int32
+	Limit  int32
+}
+
+func (q *Queries) GetPagedPurchases(ctx context.Context, arg GetPagedPurchasesParams) ([]Purchase, error) {
+	rows, err := q.db.QueryContext(ctx, getPagedPurchases, arg.Offset, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Purchase
+	for rows.Next() {
+		var i Purchase
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Chicken,
+			&i.PricePerChicken,
+			&i.UserID,
+			&i.FarmerID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getPurchaseByID = `-- name: GetPurchaseByID :one
 
 SELECT id, created_at, updated_at, chicken, price_per_chicken, user_id, farmer_id FROM purchases
@@ -137,4 +178,15 @@ func (q *Queries) GetPurchases(ctx context.Context) ([]Purchase, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const getPurchasesCount = `-- name: GetPurchasesCount :one
+SELECT COUNT(*) AS total FROM purchases
+`
+
+func (q *Queries) GetPurchasesCount(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getPurchasesCount)
+	var total int64
+	err := row.Scan(&total)
+	return total, err
 }

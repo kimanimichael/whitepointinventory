@@ -31,6 +31,7 @@ func (h *PurchasesHandler) RegisterRoutes(router chi.Router) {
 	router.Post("/purchases", purchasesAuth.MiddlewareAuth(h.CreatePurchase))
 	router.Get("/purchase", h.GetPurchaseByID)
 	router.Get("/purchases", h.GetPurchases)
+	router.Get("/paged_purchases", h.GetPagedPurchases)
 	router.Delete("/purchases/{purchase_id}", purchasesAuth.MiddlewareAuth(h.DeletePurchase))
 }
 
@@ -91,6 +92,22 @@ func (h *PurchasesHandler) GetPurchases(w http.ResponseWriter, r *http.Request) 
 	}
 	purchasesResponse := purchaseToPurchaseResponses(fetchedPurchases)
 	httpresponses.RespondWithJson(w, http.StatusOK, purchasesResponse)
+}
+
+func (h *PurchasesHandler) GetPagedPurchases(w http.ResponseWriter, r *http.Request) {
+	params := GetPagedPurchasesRequest{}
+
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&params); err != nil {
+		httpresponses.RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("Failed to decode request body"))
+		return
+	}
+	ctx := r.Context()
+	pagedPurchases, err := h.service.GetPagedPurchases(ctx, params.Offset, params.Limit)
+	if err != nil {
+		httpresponses.RespondWithError(w, http.StatusInternalServerError, err.Error())
+	}
+	httpresponses.RespondWithJson(w, http.StatusOK, pagedPurchases)
 }
 
 func (h *PurchasesHandler) DeletePurchase(w http.ResponseWriter, r *http.Request, user *users.User) {

@@ -11,3 +11,8 @@ type CreatePurchaseRequest struct {
 type GetTransactionRequest struct {
 	ID uuid.UUID `json:"payment_id"`
 }
+
+type GetPagedPurchasesRequest struct {
+	Offset uint32 `json:"offset"`
+	Limit  uint32 `json:"limit"`
+}

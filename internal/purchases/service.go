@@ -91,6 +91,14 @@ func (s *purchaseService) GetPurchases(ctx context.Context) ([]Purchase, error) 
 	return purchases, nil
 }
 
+func (s *purchaseService) GetPagedPurchases(ctx context.Context, offset, limit uint32) (*PurchasePage, error) {
+	purchasePage, err := s.repo.GetPagedPurchases(ctx, offset, limit)
+	if err != nil {
+		return nil, err
+	}
+	return purchasePage, nil
+}
+
 func (s *purchaseService) DeletePurchaseByID(ctx context.Context, ID uuid.UUID) error {
 	err := s.repo.DeletePurchase(ctx, ID)
 	if err != nil {

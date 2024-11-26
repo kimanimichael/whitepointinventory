@@ -7,6 +7,14 @@ RETURNING *;
 
 SELECT * FROM purchases ORDER BY created_at DESC;
 
+-- name: GetPagedPurchases :many
+SELECT * FROM purchases ORDER BY created_at DESC
+OFFSET $1 LIMIT $2;
+
+-- name: GetPurchasesCount :one
+SELECT COUNT(*) AS total FROM purchases;
+
+
 -- name: GetPurchaseByID :one
 
 SELECT * FROM purchases
