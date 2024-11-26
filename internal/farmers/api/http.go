@@ -24,6 +24,7 @@ func (h *FarmerHandler) RegisterRoutes(router chi.Router) {
 	router.Post("/farmers", h.CreateFarmer)
 	router.Get("/farmers", h.GetFarmerByName)
 	router.Get("/farmer", h.GetFarmers)
+	router.Get("/paged_farmers", h.GetPagedFarmers)
 	router.Delete("/farmer", h.DeleteFarmerByID)
 }
 
@@ -80,6 +81,24 @@ func (h *FarmerHandler) GetFarmers(w http.ResponseWriter, r *http.Request) {
 	}
 	farmersResponse := farmersToResponseFarmers(fetchedFarmers)
 	httpresponses.RespondWithJson(w, http.StatusOK, farmersResponse)
+}
+
+func (h *FarmerHandler) GetPagedFarmers(w http.ResponseWriter, r *http.Request) {
+	params := GetPagedFarmersRequest{}
+
+	decode := json.NewDecoder(r.Body)
+	if err := decode.Decode(&params); err != nil {
+		httpresponses.RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Could not decode parameters :%v", err))
+		return
+	}
+	ctx := r.Context()
+
+	fetchedFarmers, err := h.service.GetPagedFarmers(ctx, params.Offset, params.Limit)
+	if err != nil {
+		httpresponses.RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Could not get fetchedFarmers :%v", err))
+		return
+	}
+	httpresponses.RespondWithJson(w, http.StatusOK, fetchedFarmers)
 }
 
 func (h *FarmerHandler) DeleteFarmerByID(w http.ResponseWriter, r *http.Request) {

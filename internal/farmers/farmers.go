@@ -30,6 +30,7 @@ type FarmerService interface {
 	CreateFarmer(ctx context.Context, name string, chickenBalance float64, cashBalance int32) (*Farmer, error)
 	GetFarmerByName(ctx context.Context, name string) (*Farmer, error)
 	GetFarmers(ctx context.Context) ([]Farmer, error)
+	GetPagedFarmers(ctx context.Context, offset, limit uint32) (*FarmersPage, error)
 	DeleteFarmerByID(ctx context.Context, ID uuid.UUID) error
 }
 

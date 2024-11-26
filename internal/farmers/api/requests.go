@@ -9,3 +9,8 @@ type CreateFarmerRequest struct {
 type GetFarmerRequest struct {
 	Name string `json:"name"`
 }
+
+type GetPagedFarmersRequest struct {
+	Offset uint32 `json:"offset"`
+	Limit  uint32 `json:"limit"`
+}

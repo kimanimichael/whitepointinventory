@@ -54,6 +54,14 @@ func (s *farmerService) GetFarmers(ctx context.Context) ([]Farmer, error) {
 	return farmers, nil
 }
 
+func (s *farmerService) GetPagedFarmers(ctx context.Context, offset, limit uint32) (*FarmersPage, error) {
+	farmersPage, err := s.repo.GetPagedFarmers(ctx, offset, limit)
+	if err != nil {
+		return nil, err
+	}
+	return farmersPage, nil
+}
+
 func (s *farmerService) DeleteFarmerByID(ctx context.Context, ID uuid.UUID) error {
 	err := s.repo.DeleteFarmerByID(ctx, ID)
 	if err != nil {
