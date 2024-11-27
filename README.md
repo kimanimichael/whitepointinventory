@@ -33,9 +33,14 @@ cd sql/schema
 goose postgres postgres://{userName}:{password}@localhost:5432/{databaseName} up
 ``
 
+#### Build
+``
+make build
+``
+
 #### Build and Start the Server
 ``
-go build && ./whitepointinventory
+make run
 ``
 
 ## Documentation
