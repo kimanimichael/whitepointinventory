@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/mike-kimani/fechronizo/v2/pkg/httpresponses"
 	"github.com/mike-kimani/whitepointinventory/internal/users"
-	"github.com/mike-kimani/whitepointinventory/pkg/auth"
+	httpauth "github.com/mike-kimani/whitepointinventory/pkg/http"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"time"
@@ -72,7 +72,7 @@ func (h *UserHandler) GetUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *UserHandler) UserLogin(w http.ResponseWriter, r *http.Request) {
-	email, password, err := auth.GetPasswordAndEmailFromBody(r)
+	email, password, err := httpauth.GetPasswordAndEmailFromBody(r)
 	if err != nil {
 		httpresponses.RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("Invalid request payload: %v", err))
 		return
