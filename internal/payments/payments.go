@@ -21,10 +21,21 @@ type Payment struct {
 	FarmerCashBalance    int32
 }
 
+type page struct {
+	Offset uint32
+	Total  uint32
+}
+
+type PaymentPage struct {
+	page
+	Payments []Payment
+}
+
 type PaymentsService interface {
 	CreatePayment(ctx context.Context, cashPaid, chickenPrice int32, farmerName string, user *users.User) (*Payment, error)
 	GetPaymentByID(ctx context.Context, ID uuid.UUID) (*Payment, error)
 	GetPayments(ctx context.Context) ([]Payment, error)
+	GetPagedPayments(ctx context.Context, offset, limit uint32) (*PaymentPage, error)
 	DeletePaymentByID(ctx context.Context, ID uuid.UUID) error
 }
 
@@ -33,5 +44,6 @@ type PaymentsRepository interface {
 	GetPaymentByID(ctx context.Context, ID uuid.UUID) (*Payment, error)
 	GetMostRecentPayment(ctx context.Context) (*Payment, error)
 	GetPayments(ctx context.Context) ([]Payment, error)
+	GetPagedPayments(ctx context.Context, offset, limit uint32) (*PaymentPage, error)
 	DeletePayment(ctx context.Context, ID uuid.UUID) error
 }

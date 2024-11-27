@@ -6,6 +6,13 @@ RETURNING *;
 -- name: GetPayments :many
 SELECT * FROM payments ORDER BY created_at DESC;
 
+-- name: GetPagedPayments :many
+SELECT * FROM payments ORDER BY created_at DESC
+OFFSET $1 LIMIT $2;
+
+-- name: GetPaymentCount :one
+SELECT COUNT(*) AS total FROM payments;
+
 -- name: GetPaymentByID :one
 SELECT * FROM payments
 WHERE id = $1;

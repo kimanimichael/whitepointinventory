@@ -98,6 +98,14 @@ func (s *paymentsService) GetPayments(ctx context.Context) ([]Payment, error) {
 	return payments, nil
 }
 
+func (s *paymentsService) GetPagedPayments(ctx context.Context, offset, limit uint32) (*PaymentPage, error) {
+	payments, err := s.repo.GetPagedPayments(ctx, offset, limit)
+	if err != nil {
+		return nil, err
+	}
+	return payments, nil
+}
+
 func (s *paymentsService) DeletePaymentByID(ctx context.Context, ID uuid.UUID) error {
 	err := s.repo.DeletePayment(ctx, ID)
 	if err != nil {

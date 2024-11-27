@@ -161,6 +161,52 @@ func (r *PaymentRepositorySql) GetPayments(ctx context.Context) ([]Payment, erro
 	return paymentResponse, nil
 }
 
+func (r *PaymentRepositorySql) GetPagedPayments(ctx context.Context, offset, limit uint32) (*PaymentPage, error) {
+	var paymentResponse []Payment
+	payments, err := r.DB.GetPagedPayments(ctx, sqlcdatabase.GetPagedPaymentsParams{
+		Offset: int32(offset),
+		Limit:  int32(limit),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("error getting paged payments: %v", err)
+	}
+	for _, payment := range payments {
+		user, err := r.DB.GetUserByID(ctx, payment.UserID)
+		if err != nil {
+			return nil, fmt.Errorf("error getting user from payments: %v", err)
+		}
+		farmer, err := r.DB.GetFarmerByID(ctx, payment.FarmerID)
+		if err != nil {
+			return nil, fmt.Errorf("error getting farmer from payments: %v", err)
+		}
+		paymentResponse = append(paymentResponse, Payment{
+			ID:                   payment.ID,
+			CreatedAt:            payment.CreatedAt,
+			UpdatedAt:            payment.UpdatedAt,
+			CashPaid:             payment.CashPaid,
+			PricePerChickenPaid:  payment.PricePerChickenPaid,
+			FarmerID:             payment.FarmerID,
+			UserID:               payment.UserID,
+			UserName:             user.Name,
+			FarmerName:           farmer.Name,
+			FarmerChickenBalance: farmer.ChickenBalance.Float64,
+			FarmerCashBalance:    farmer.CashBalance.Int32,
+		})
+	}
+	totalPayments, err := r.DB.GetPaymentCount(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("error getting total payments: %v", err)
+	}
+	paymentsPage := &PaymentPage{
+		page: page{
+			Offset: offset,
+			Total:  uint32(totalPayments),
+		},
+		Payments: paymentResponse,
+	}
+	return paymentsPage, nil
+}
+
 func (r *PaymentRepositorySql) DeletePayment(ctx context.Context, ID uuid.UUID) error {
 	cashBalance := sql.NullInt32{}
 	chickenBalance := sql.NullFloat64{}

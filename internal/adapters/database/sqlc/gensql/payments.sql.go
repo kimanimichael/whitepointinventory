@@ -81,6 +81,47 @@ func (q *Queries) GetMostRecentPayment(ctx context.Context) (Payment, error) {
 	return i, err
 }
 
+const getPagedPayments = `-- name: GetPagedPayments :many
+SELECT id, created_at, updated_at, cash_paid, price_per_chicken_paid, user_id, farmer_id FROM payments ORDER BY created_at DESC
+OFFSET $1 LIMIT $2
+`
+
+type GetPagedPaymentsParams struct {
+	Offset int32
+	Limit  int32
+}
+
+func (q *Queries) GetPagedPayments(ctx context.Context, arg GetPagedPaymentsParams) ([]Payment, error) {
+	rows, err := q.db.QueryContext(ctx, getPagedPayments, arg.Offset, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Payment
+	for rows.Next() {
+		var i Payment
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.CashPaid,
+			&i.PricePerChickenPaid,
+			&i.UserID,
+			&i.FarmerID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getPaymentByID = `-- name: GetPaymentByID :one
 SELECT id, created_at, updated_at, cash_paid, price_per_chicken_paid, user_id, farmer_id FROM payments
 WHERE id = $1
@@ -99,6 +140,17 @@ func (q *Queries) GetPaymentByID(ctx context.Context, id uuid.UUID) (Payment, er
 		&i.FarmerID,
 	)
 	return i, err
+}
+
+const getPaymentCount = `-- name: GetPaymentCount :one
+SELECT COUNT(*) AS total FROM payments
+`
+
+func (q *Queries) GetPaymentCount(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getPaymentCount)
+	var total int64
+	err := row.Scan(&total)
+	return total, err
 }
 
 const getPayments = `-- name: GetPayments :many
