@@ -2,7 +2,6 @@ package farmers
 
 import (
 	"context"
-	"github.com/google/uuid"
 )
 
 type farmerService struct {
@@ -62,7 +61,7 @@ func (s *farmerService) GetPagedFarmers(ctx context.Context, offset, limit uint3
 	return farmersPage, nil
 }
 
-func (s *farmerService) DeleteFarmerByID(ctx context.Context, ID uuid.UUID) error {
+func (s *farmerService) DeleteFarmerByID(ctx context.Context, ID string) error {
 	err := s.repo.DeleteFarmerByID(ctx, ID)
 	if err != nil {
 		return err

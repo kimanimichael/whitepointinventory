@@ -33,7 +33,7 @@ func (r *UserRepositorySql) CreateUser(ctx context.Context, name, email, passwor
 		return nil, fmt.Errorf("error creating user: %v", err)
 	}
 	return &User{
-		ID:        user.ID,
+		ID:        user.ID.String(),
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 		Name:      user.Name,
@@ -42,13 +42,17 @@ func (r *UserRepositorySql) CreateUser(ctx context.Context, name, email, passwor
 	}, nil
 }
 
-func (r *UserRepositorySql) GetUserByID(ctx context.Context, ID uuid.UUID) (*User, error) {
-	user, err := r.DB.GetUserByID(ctx, ID)
+func (r *UserRepositorySql) GetUserByID(ctx context.Context, ID string) (*User, error) {
+	userID, err := uuid.Parse(ID)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing user ID: %v", err)
+	}
+	user, err := r.DB.GetUserByID(ctx, userID)
 	if err != nil {
 		return nil, fmt.Errorf("error getting user: %v", err)
 	}
 	return &User{
-		ID:        user.ID,
+		ID:        user.ID.String(),
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 		Name:      user.Name,
@@ -63,7 +67,7 @@ func (r *UserRepositorySql) GetUserByEmail(ctx context.Context, email string) (*
 		return nil, fmt.Errorf("error getting user from email: %v", err)
 	}
 	return &User{
-		ID:        user.ID,
+		ID:        user.ID.String(),
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 		Name:      user.Name,
@@ -79,7 +83,7 @@ func (r *UserRepositorySql) GetUserByAPIKey(ctx context.Context, key string) (*U
 		return nil, fmt.Errorf("error getting user from APIKey: %v", err)
 	}
 	return &User{
-		ID:        user.ID,
+		ID:        user.ID.String(),
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 		Name:      user.Name,
@@ -98,7 +102,7 @@ func (r *UserRepositorySql) GetUsers(ctx context.Context) ([]User, error) {
 	var userList []User
 	for _, user := range users {
 		userList = append(userList, User{
-			ID:        user.ID,
+			ID:        user.ID.String(),
 			CreatedAt: user.CreatedAt,
 			UpdatedAt: user.UpdatedAt,
 			Name:      user.Name,

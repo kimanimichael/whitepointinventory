@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-chi/chi"
-	"github.com/google/uuid"
 	"github.com/mike-kimani/fechronizo/v2/pkg/httpresponses"
 	"github.com/mike-kimani/whitepointinventory/internal/http"
 	"github.com/mike-kimani/whitepointinventory/internal/purchases"
@@ -111,16 +110,11 @@ func (h *PurchasesHandler) GetPagedPurchases(w http.ResponseWriter, r *http.Requ
 }
 
 func (h *PurchasesHandler) DeletePurchase(w http.ResponseWriter, r *http.Request, user *users.User) {
-	purchaseIDStr := chi.URLParam(r, "purchase_id")
-	purchaseID, err := uuid.Parse(purchaseIDStr)
-	if err != nil {
-		httpresponses.RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("Could not parse uuid: %s", purchaseIDStr))
-		return
-	}
+	purchaseID := chi.URLParam(r, "purchase_id")
 
 	ctx := r.Context()
 
-	err = h.service.DeletePurchaseByID(ctx, purchaseID)
+	err := h.service.DeletePurchaseByID(ctx, purchaseID)
 	if err != nil {
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return

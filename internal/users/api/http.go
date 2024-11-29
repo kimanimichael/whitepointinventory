@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-chi/chi"
-	"github.com/google/uuid"
 	"github.com/mike-kimani/fechronizo/v2/pkg/httpresponses"
 	"github.com/mike-kimani/whitepointinventory/internal/users"
 	httpauth "github.com/mike-kimani/whitepointinventory/pkg/http"
@@ -93,7 +92,7 @@ func (h *UserHandler) UserLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		Issuer:    user.ID.String(),
+		Issuer:    user.ID,
 		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
 	})
 	token, err := claims.SignedString([]byte(secretKey))
@@ -127,11 +126,7 @@ func (h *UserHandler) GetUserFromCookie(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	claims := token.Claims.(*jwt.StandardClaims)
-	userID, err := uuid.Parse(claims.Issuer)
-	if err != nil {
-		httpresponses.RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Error parsing userID: %v", err))
-		return
-	}
+	userID := claims.Issuer
 
 	ctx := r.Context()
 

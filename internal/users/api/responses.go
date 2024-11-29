@@ -1,13 +1,12 @@
 package usersapi
 
 import (
-	"github.com/google/uuid"
 	"github.com/mike-kimani/whitepointinventory/internal/users"
 	"time"
 )
 
 type userResponse struct {
-	ID        uuid.UUID `json:"ID"`
+	ID        string    `json:"ID"`
 	CreatedAt time.Time `json:"CreatedAt"`
 	UpdatedAt time.Time `json:"UpdatedAt"`
 	Name      string    `json:"Name"`

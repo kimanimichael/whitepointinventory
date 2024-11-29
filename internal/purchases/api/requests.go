@@ -1,7 +1,5 @@
 package purchasesapi
 
-import "github.com/google/uuid"
-
 type CreatePurchaseRequest struct {
 	ChickenNo    int32  `json:"chicken_no"`
 	ChickenPrice int32  `json:"chicken_price"`
@@ -9,7 +7,7 @@ type CreatePurchaseRequest struct {
 }
 
 type GetTransactionRequest struct {
-	ID uuid.UUID `json:"payment_id"`
+	ID string `json:"payment_id"`
 }
 
 type GetPagedPurchasesRequest struct {

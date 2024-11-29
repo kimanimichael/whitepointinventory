@@ -42,7 +42,7 @@ func (r *FarmerRepositorySQL) CreateFarmer(ctx context.Context, name string, chi
 		return nil, fmt.Errorf("error creating farmer: %v", err)
 	}
 	return &Farmer{
-		ID:             farmer.ID,
+		ID:             farmer.ID.String(),
 		CreatedAt:      farmer.CreatedAt,
 		UpdatedAt:      farmer.UpdatedAt,
 		Name:           farmer.Name,
@@ -57,7 +57,7 @@ func (r *FarmerRepositorySQL) GetFarmerByName(ctx context.Context, name string) 
 		return nil, fmt.Errorf("error getting farmer: %v", err)
 	}
 	return &Farmer{
-		ID:             farmer.ID,
+		ID:             farmer.ID.String(),
 		CreatedAt:      farmer.CreatedAt,
 		UpdatedAt:      farmer.UpdatedAt,
 		Name:           farmer.Name,
@@ -74,7 +74,7 @@ func (r *FarmerRepositorySQL) GetFarmers(ctx context.Context) ([]Farmer, error) 
 	var farmersToReturn []Farmer
 	for _, farmer := range farmers {
 		farmersToReturn = append(farmersToReturn, Farmer{
-			ID:             farmer.ID,
+			ID:             farmer.ID.String(),
 			CreatedAt:      farmer.CreatedAt,
 			UpdatedAt:      farmer.UpdatedAt,
 			Name:           farmer.Name,
@@ -100,7 +100,7 @@ func (r *FarmerRepositorySQL) GetPagedFarmers(ctx context.Context, offset, limit
 	var farmersToReturn []Farmer
 	for _, farmer := range farmers {
 		farmersToReturn = append(farmersToReturn, Farmer{
-			ID:             farmer.ID,
+			ID:             farmer.ID.String(),
 			CreatedAt:      farmer.CreatedAt,
 			UpdatedAt:      farmer.UpdatedAt,
 			Name:           farmer.Name,
@@ -117,8 +117,12 @@ func (r *FarmerRepositorySQL) GetPagedFarmers(ctx context.Context, offset, limit
 	return page, nil
 }
 
-func (r *FarmerRepositorySQL) DeleteFarmerByID(ctx context.Context, ID uuid.UUID) error {
-	err := r.DB.DeleteFarmers(ctx, ID)
+func (r *FarmerRepositorySQL) DeleteFarmerByID(ctx context.Context, ID string) error {
+	userID, err := uuid.Parse(ID)
+	if err != nil {
+		return fmt.Errorf("error parsing farmer ID: %v", err)
+	}
+	err = r.DB.DeleteFarmers(ctx, userID)
 	if err != nil {
 		return fmt.Errorf("error deleting farmer: %v", err)
 	}

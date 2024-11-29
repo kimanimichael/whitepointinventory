@@ -3,7 +3,6 @@ package purchases
 import (
 	"context"
 	"fmt"
-	"github.com/google/uuid"
 	"github.com/mike-kimani/whitepointinventory/internal/users"
 	"time"
 )
@@ -75,7 +74,7 @@ func (s *purchaseService) CreatePurchase(ctx context.Context, chickenNo, chicken
 	return purchase, nil
 }
 
-func (s *purchaseService) GetPurchaseByID(ctx context.Context, ID uuid.UUID) (*Purchase, error) {
+func (s *purchaseService) GetPurchaseByID(ctx context.Context, ID string) (*Purchase, error) {
 	purchase, err := s.repo.GetPurchaseByID(ctx, ID)
 	if err != nil {
 		return nil, err
@@ -99,7 +98,7 @@ func (s *purchaseService) GetPagedPurchases(ctx context.Context, offset, limit u
 	return purchasePage, nil
 }
 
-func (s *purchaseService) DeletePurchaseByID(ctx context.Context, ID uuid.UUID) error {
+func (s *purchaseService) DeletePurchaseByID(ctx context.Context, ID string) error {
 	err := s.repo.DeletePurchase(ctx, ID)
 	if err != nil {
 		return err

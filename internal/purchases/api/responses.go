@@ -1,19 +1,18 @@
 package purchasesapi
 
 import (
-	"github.com/google/uuid"
 	"github.com/mike-kimani/whitepointinventory/internal/purchases"
 	"time"
 )
 
 type PurchaseResponse struct {
-	ID                   uuid.UUID `json:"id"`
+	ID                   string    `json:"id"`
 	CreatedAt            time.Time `json:"created_at"`
 	UpdatedAt            time.Time `json:"updated_at"`
 	Chicken              int32     `json:"chicken"`
 	PricePerChicken      int32     `json:"price_per_chicken"`
-	UserID               uuid.UUID `json:"user_id"`
-	FarmerID             uuid.UUID `json:"farmer_id"`
+	UserID               string    `json:"user_id"`
+	FarmerID             string    `json:"farmer_id"`
 	UserName             string    `json:"user_name"`
 	FarmerName           string    `json:"farmer_name"`
 	FarmerChickenBalance float64   `json:"chicken_balance"`

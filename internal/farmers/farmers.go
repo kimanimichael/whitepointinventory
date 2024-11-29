@@ -2,12 +2,11 @@ package farmers
 
 import (
 	"context"
-	"github.com/google/uuid"
 	"time"
 )
 
 type Farmer struct {
-	ID             uuid.UUID
+	ID             string
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 	Name           string
@@ -31,7 +30,7 @@ type FarmerService interface {
 	GetFarmerByName(ctx context.Context, name string) (*Farmer, error)
 	GetFarmers(ctx context.Context) ([]Farmer, error)
 	GetPagedFarmers(ctx context.Context, offset, limit uint32) (*FarmersPage, error)
-	DeleteFarmerByID(ctx context.Context, ID uuid.UUID) error
+	DeleteFarmerByID(ctx context.Context, ID string) error
 }
 
 type FarmerRepository interface {
@@ -39,5 +38,5 @@ type FarmerRepository interface {
 	GetFarmerByName(ctx context.Context, name string) (*Farmer, error)
 	GetFarmers(ctx context.Context) ([]Farmer, error)
 	GetPagedFarmers(ctx context.Context, offset, limit uint32) (*FarmersPage, error)
-	DeleteFarmerByID(ctx context.Context, ID uuid.UUID) error
+	DeleteFarmerByID(ctx context.Context, ID string) error
 }

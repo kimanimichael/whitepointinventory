@@ -27,13 +27,17 @@ func (r *PurchaseRepositorySQL) CreatePurchase(ctx context.Context, chickenNo, c
 	if err != nil {
 		return nil, fmt.Errorf("could not get farmer: %w", err)
 	}
+	userID, err := uuid.Parse(user.ID)
+	if err != nil {
+		return nil, fmt.Errorf("could not parse user ID: %w", err)
+	}
 	purchase, err := r.DB.CreatePurchase(ctx, sqlcdatabase.CreatePurchaseParams{
 		ID:              uuid.New(),
 		CreatedAt:       time.Now(),
 		UpdatedAt:       time.Now(),
 		Chicken:         chickenNo,
 		PricePerChicken: chickenPrice,
-		UserID:          user.ID,
+		UserID:          userID,
 		FarmerID:        farmer.ID,
 	})
 	if err != nil {
@@ -75,11 +79,11 @@ func (r *PurchaseRepositorySQL) CreatePurchase(ctx context.Context, chickenNo, c
 	}
 
 	return &Purchase{
-		ID:                   purchase.ID,
+		ID:                   purchase.ID.String(),
 		CreatedAt:            purchase.CreatedAt,
 		UpdatedAt:            purchase.UpdatedAt,
-		FarmerID:             purchase.FarmerID,
-		UserID:               purchase.UserID,
+		FarmerID:             purchase.FarmerID.String(),
+		UserID:               purchase.UserID.String(),
 		FarmerName:           farmer.Name,
 		UserName:             user.Name,
 		Chicken:              purchase.Chicken,
@@ -89,17 +93,21 @@ func (r *PurchaseRepositorySQL) CreatePurchase(ctx context.Context, chickenNo, c
 	}, nil
 }
 
-func (r *PurchaseRepositorySQL) GetPurchaseByID(ctx context.Context, ID uuid.UUID) (*Purchase, error) {
-	purchase, err := r.DB.GetPurchaseByID(ctx, ID)
+func (r *PurchaseRepositorySQL) GetPurchaseByID(ctx context.Context, ID string) (*Purchase, error) {
+	purchaseID, err := uuid.Parse(ID)
+	if err != nil {
+		return nil, fmt.Errorf("could not parse purchase ID: %w", err)
+	}
+	purchase, err := r.DB.GetPurchaseByID(ctx, purchaseID)
 	if err != nil {
 		return nil, fmt.Errorf("error getting purchase ID: %v", err)
 	}
 	return &Purchase{
-		ID:              purchase.ID,
+		ID:              purchase.ID.String(),
 		CreatedAt:       purchase.CreatedAt,
 		UpdatedAt:       purchase.UpdatedAt,
-		FarmerID:        purchase.FarmerID,
-		UserID:          purchase.UserID,
+		FarmerID:        purchase.FarmerID.String(),
+		UserID:          purchase.UserID.String(),
 		Chicken:         purchase.Chicken,
 		PricePerChicken: purchase.PricePerChicken,
 	}, nil
@@ -116,12 +124,12 @@ func (r *PurchaseRepositorySQL) GetMostRecentPurchase(ctx context.Context) (*Pur
 		return nil, fmt.Errorf("error getting farmer from most recent purchase: %v", err)
 	}
 	return &Purchase{
-		ID:              purchase.ID,
+		ID:              purchase.ID.String(),
 		CreatedAt:       purchase.CreatedAt,
 		UpdatedAt:       purchase.UpdatedAt,
-		FarmerID:        purchase.FarmerID,
+		FarmerID:        purchase.FarmerID.String(),
 		FarmerName:      farmer.Name,
-		UserID:          purchase.UserID,
+		UserID:          purchase.UserID.String(),
 		Chicken:         purchase.Chicken,
 		PricePerChicken: purchase.PricePerChicken,
 	}, nil
@@ -137,19 +145,24 @@ func (r *PurchaseRepositorySQL) GetPurchases(ctx context.Context) ([]Purchase, e
 
 	for _, purchase := range purchases {
 		purchaseWithName := &Purchase{
-			ID:              purchase.ID,
+			ID:              purchase.ID.String(),
 			CreatedAt:       purchase.CreatedAt,
 			UpdatedAt:       purchase.UpdatedAt,
 			Chicken:         purchase.Chicken,
 			PricePerChicken: purchase.PricePerChicken,
-			FarmerID:        purchase.FarmerID,
+			UserID:          purchase.UserID.String(),
+			FarmerID:        purchase.FarmerID.String(),
 		}
 		user, err := r.DB.GetUserByID(ctx, purchase.UserID)
 		if err != nil {
 			return nil, fmt.Errorf("error getting user from purchase: %v", err)
 		}
 		purchaseWithName.UserName = user.Name
-		farmer, err := r.DB.GetFarmerByID(ctx, purchaseWithName.FarmerID)
+		farmerID, err := uuid.Parse(purchaseWithName.FarmerID)
+		if err != nil {
+			return nil, fmt.Errorf("could not parse farmer ID: %v", err)
+		}
+		farmer, err := r.DB.GetFarmerByID(ctx, farmerID)
 		if err != nil {
 			return nil, fmt.Errorf("error getting farmer from purchase: %v", err)
 		}
@@ -183,12 +196,12 @@ func (r *PurchaseRepositorySQL) GetPagedPurchases(ctx context.Context, offset, l
 			return nil, fmt.Errorf("error getting farmer from purchase: %v", err)
 		}
 		purchasesToReturn = append(purchasesToReturn, Purchase{
-			ID:                   purchase.ID,
+			ID:                   purchase.ID.String(),
 			CreatedAt:            purchase.CreatedAt,
 			UpdatedAt:            purchase.UpdatedAt,
 			Chicken:              purchase.Chicken,
 			PricePerChicken:      purchase.PricePerChicken,
-			FarmerID:             purchase.FarmerID,
+			FarmerID:             purchase.FarmerID.String(),
 			UserName:             user.Name,
 			FarmerName:           farmer.Name,
 			FarmerChickenBalance: farmer.ChickenBalance.Float64,
@@ -207,11 +220,14 @@ func (r *PurchaseRepositorySQL) GetPagedPurchases(ctx context.Context, offset, l
 	return returnedPage, nil
 }
 
-func (r *PurchaseRepositorySQL) DeletePurchase(ctx context.Context, ID uuid.UUID) error {
+func (r *PurchaseRepositorySQL) DeletePurchase(ctx context.Context, ID string) error {
 	cashBalance := sql.NullInt32{}
 	chickenBalance := sql.NullFloat64{}
-
-	purchase, err := r.DB.GetPurchaseByID(ctx, ID)
+	purchaseID, err := uuid.Parse(ID)
+	if err != nil {
+		return fmt.Errorf("error parsing purchase ID: %v", err)
+	}
+	purchase, err := r.DB.GetPurchaseByID(ctx, purchaseID)
 	if err != nil {
 		return fmt.Errorf("error getting purchase from ID: %v", err)
 	}
@@ -234,7 +250,7 @@ func (r *PurchaseRepositorySQL) DeletePurchase(ctx context.Context, ID uuid.UUID
 	if err != nil {
 		return fmt.Errorf("couldn't decrease chicken owed: %v", err)
 	}
-	err = r.DB.DeletePurchase(ctx, ID)
+	err = r.DB.DeletePurchase(ctx, purchaseID)
 	if err != nil {
 		return fmt.Errorf("couldn't delete purchase: %v", err)
 	}

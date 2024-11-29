@@ -3,7 +3,6 @@ package users
 import (
 	"context"
 	"errors"
-	"github.com/google/uuid"
 	"strings"
 )
 
@@ -39,7 +38,7 @@ func (s *service) CreateUser(ctx context.Context, name, email, password string) 
 	}, nil
 }
 
-func (s *service) GetUserByID(ctx context.Context, ID uuid.UUID) (*User, error) {
+func (s *service) GetUserByID(ctx context.Context, ID string) (*User, error) {
 	user, err := s.repo.GetUserByID(ctx, ID)
 	if err != nil {
 		return nil, err

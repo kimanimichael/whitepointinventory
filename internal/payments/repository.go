@@ -25,13 +25,17 @@ func (r *PaymentRepositorySql) CreatePayment(ctx context.Context, cashPaid, chic
 	if err != nil {
 		return nil, fmt.Errorf("error getting farmer: %v", err)
 	}
+	userID, err := uuid.Parse(user.ID)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing user ID: %v", err)
+	}
 	payment, err := r.DB.CreatePayment(ctx, sqlcdatabase.CreatePaymentParams{
 		ID:                  uuid.New(),
 		CreatedAt:           time.Now(),
 		UpdatedAt:           time.Now(),
 		CashPaid:            cashPaid,
 		PricePerChickenPaid: chickenPrice,
-		UserID:              user.ID,
+		UserID:              userID,
 		FarmerID:            farmer.ID,
 	})
 	if err != nil {
@@ -74,13 +78,13 @@ func (r *PaymentRepositorySql) CreatePayment(ctx context.Context, cashPaid, chic
 
 	//modelPayment := models.DatabasePaymentToPayment(payment)
 	return &Payment{
-		ID:                   payment.ID,
+		ID:                   payment.ID.String(),
 		CreatedAt:            payment.CreatedAt,
 		UpdatedAt:            payment.UpdatedAt,
 		CashPaid:             payment.CashPaid,
 		PricePerChickenPaid:  payment.PricePerChickenPaid,
-		UserID:               payment.UserID,
-		FarmerID:             payment.FarmerID,
+		UserID:               payment.UserID.String(),
+		FarmerID:             payment.FarmerID.String(),
 		UserName:             user.Name,
 		FarmerName:           farmer.Name,
 		FarmerChickenBalance: updatedFarmer.ChickenBalance.Float64,
@@ -96,12 +100,12 @@ func (r *PaymentRepositorySql) GetPaymentByID(ctx context.Context, ID string) (*
 	}
 	//modelPayment := models.DatabasePaymentToPayment(payment)
 	return &Payment{
-		ID:                  payment.ID,
+		ID:                  payment.ID.String(),
 		CreatedAt:           payment.CreatedAt,
 		UpdatedAt:           payment.UpdatedAt,
 		CashPaid:            payment.CashPaid,
 		PricePerChickenPaid: payment.PricePerChickenPaid,
-		FarmerID:            payment.FarmerID,
+		FarmerID:            payment.FarmerID.String(),
 	}, nil
 }
 
@@ -115,12 +119,12 @@ func (r *PaymentRepositorySql) GetMostRecentPayment(ctx context.Context) (*Payme
 		return nil, fmt.Errorf("error getting farmer from most recent purchase: %v", err)
 	}
 	return &Payment{
-		ID:                   payment.ID,
+		ID:                   payment.ID.String(),
 		CreatedAt:            payment.CreatedAt,
 		UpdatedAt:            payment.UpdatedAt,
 		CashPaid:             payment.CashPaid,
 		PricePerChickenPaid:  payment.PricePerChickenPaid,
-		FarmerID:             payment.FarmerID,
+		FarmerID:             payment.FarmerID.String(),
 		FarmerName:           farmer.Name,
 		FarmerChickenBalance: farmer.ChickenBalance.Float64,
 		FarmerCashBalance:    farmer.CashBalance.Int32,
@@ -146,13 +150,13 @@ func (r *PaymentRepositorySql) GetPayments(ctx context.Context) ([]Payment, erro
 			return nil, fmt.Errorf("error getting farmer from payment: %v", err)
 		}
 		paymentResponse = append(paymentResponse, Payment{
-			ID:                   payment.ID,
+			ID:                   payment.ID.String(),
 			CreatedAt:            payment.CreatedAt,
 			UpdatedAt:            payment.UpdatedAt,
 			CashPaid:             payment.CashPaid,
 			PricePerChickenPaid:  payment.PricePerChickenPaid,
-			FarmerID:             payment.FarmerID,
-			UserID:               payment.UserID,
+			FarmerID:             payment.FarmerID.String(),
+			UserID:               payment.UserID.String(),
 			UserName:             user.Name,
 			FarmerName:           farmer.Name,
 			FarmerChickenBalance: farmer.ChickenBalance.Float64,
@@ -181,13 +185,13 @@ func (r *PaymentRepositorySql) GetPagedPayments(ctx context.Context, offset, lim
 			return nil, fmt.Errorf("error getting farmer from payments: %v", err)
 		}
 		paymentResponse = append(paymentResponse, Payment{
-			ID:                   payment.ID,
+			ID:                   payment.ID.String(),
 			CreatedAt:            payment.CreatedAt,
 			UpdatedAt:            payment.UpdatedAt,
 			CashPaid:             payment.CashPaid,
 			PricePerChickenPaid:  payment.PricePerChickenPaid,
-			FarmerID:             payment.FarmerID,
-			UserID:               payment.UserID,
+			FarmerID:             payment.FarmerID.String(),
+			UserID:               payment.UserID.String(),
 			UserName:             user.Name,
 			FarmerName:           farmer.Name,
 			FarmerChickenBalance: farmer.ChickenBalance.Float64,

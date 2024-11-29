@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-chi/chi"
-	"github.com/google/uuid"
 	"github.com/mike-kimani/fechronizo/v2/pkg/httpresponses"
 	"github.com/mike-kimani/whitepointinventory/internal/farmers"
 	"net/http"
@@ -102,16 +101,11 @@ func (h *FarmerHandler) GetPagedFarmers(w http.ResponseWriter, r *http.Request) 
 }
 
 func (h *FarmerHandler) DeleteFarmerByID(w http.ResponseWriter, r *http.Request) {
-	farmerIDStr := chi.URLParam(r, "farmerID")
-	farmerID, err := uuid.Parse(farmerIDStr)
-	if err != nil {
-		httpresponses.RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Could not parse farmerID :%v", err))
-		return
-	}
+	farmerID := chi.URLParam(r, "farmerID")
 
 	ctx := r.Context()
 
-	err = h.service.DeleteFarmerByID(ctx, farmerID)
+	err := h.service.DeleteFarmerByID(ctx, farmerID)
 	if err != nil {
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Could not delete farmer :%v", err))
 		return

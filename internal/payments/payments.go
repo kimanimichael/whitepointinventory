@@ -2,19 +2,18 @@ package payments
 
 import (
 	"context"
-	"github.com/google/uuid"
 	"github.com/mike-kimani/whitepointinventory/internal/users"
 	"time"
 )
 
 type Payment struct {
-	ID                   uuid.UUID
+	ID                   string
 	CreatedAt            time.Time
 	UpdatedAt            time.Time
 	CashPaid             int32
 	PricePerChickenPaid  int32
-	UserID               uuid.UUID
-	FarmerID             uuid.UUID
+	UserID               string
+	FarmerID             string
 	UserName             string
 	FarmerName           string
 	FarmerChickenBalance float64
