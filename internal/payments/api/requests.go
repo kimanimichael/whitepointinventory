@@ -1,7 +1,5 @@
 package paymentsapi
 
-import "github.com/google/uuid"
-
 type CreatePaymentRequest struct {
 	CashPaid     int32  `json:"cash_paid"`
 	ChickenPrice int32  `json:"price_per_chicken_paid"`
@@ -9,7 +7,7 @@ type CreatePaymentRequest struct {
 }
 
 type GetTransactionRequest struct {
-	ID uuid.UUID `json:"payment_id"`
+	ID string `json:"payment_id"`
 }
 
 type GetPagedPaymentsRequest struct {

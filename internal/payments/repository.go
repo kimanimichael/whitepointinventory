@@ -88,8 +88,9 @@ func (r *PaymentRepositorySql) CreatePayment(ctx context.Context, cashPaid, chic
 	}, nil
 }
 
-func (r *PaymentRepositorySql) GetPaymentByID(ctx context.Context, ID uuid.UUID) (*Payment, error) {
-	payment, err := r.DB.GetPaymentByID(ctx, ID)
+func (r *PaymentRepositorySql) GetPaymentByID(ctx context.Context, ID string) (*Payment, error) {
+	uuidID, err := uuid.Parse(ID)
+	payment, err := r.DB.GetPaymentByID(ctx, uuidID)
 	if err != nil {
 		return nil, fmt.Errorf("error getting payment from ID: %v", err)
 	}
@@ -207,10 +208,11 @@ func (r *PaymentRepositorySql) GetPagedPayments(ctx context.Context, offset, lim
 	return paymentsPage, nil
 }
 
-func (r *PaymentRepositorySql) DeletePayment(ctx context.Context, ID uuid.UUID) error {
+func (r *PaymentRepositorySql) DeletePayment(ctx context.Context, ID string) error {
 	cashBalance := sql.NullInt32{}
 	chickenBalance := sql.NullFloat64{}
-	payment, err := r.DB.GetPaymentByID(ctx, ID)
+	uuidID, err := uuid.Parse(ID)
+	payment, err := r.DB.GetPaymentByID(ctx, uuidID)
 	if err != nil {
 		return fmt.Errorf("error getting payment from ID: %v", err)
 	}
@@ -233,7 +235,7 @@ func (r *PaymentRepositorySql) DeletePayment(ctx context.Context, ID uuid.UUID) 
 	if err != nil {
 		return fmt.Errorf("error increasing chicken owed: %v", err)
 	}
-	err = r.DB.DeletePayments(ctx, ID)
+	err = r.DB.DeletePayments(ctx, uuidID)
 	if err != nil {
 		return fmt.Errorf("error deleting payment: %v", err)
 	}

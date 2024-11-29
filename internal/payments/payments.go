@@ -33,17 +33,17 @@ type PaymentPage struct {
 
 type PaymentsService interface {
 	CreatePayment(ctx context.Context, cashPaid, chickenPrice int32, farmerName string, user *users.User) (*Payment, error)
-	GetPaymentByID(ctx context.Context, ID uuid.UUID) (*Payment, error)
+	GetPaymentByID(ctx context.Context, ID string) (*Payment, error)
 	GetPayments(ctx context.Context) ([]Payment, error)
 	GetPagedPayments(ctx context.Context, offset, limit uint32) (*PaymentPage, error)
-	DeletePaymentByID(ctx context.Context, ID uuid.UUID) error
+	DeletePaymentByID(ctx context.Context, ID string) error
 }
 
 type PaymentsRepository interface {
 	CreatePayment(ctx context.Context, cashPaid, chickenPrice int32, farmerName string, user *users.User) (*Payment, error)
-	GetPaymentByID(ctx context.Context, ID uuid.UUID) (*Payment, error)
+	GetPaymentByID(ctx context.Context, ID string) (*Payment, error)
 	GetMostRecentPayment(ctx context.Context) (*Payment, error)
 	GetPayments(ctx context.Context) ([]Payment, error)
 	GetPagedPayments(ctx context.Context, offset, limit uint32) (*PaymentPage, error)
-	DeletePayment(ctx context.Context, ID uuid.UUID) error
+	DeletePayment(ctx context.Context, ID string) error
 }

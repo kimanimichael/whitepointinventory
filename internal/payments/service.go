@@ -3,7 +3,6 @@ package payments
 import (
 	"context"
 	"fmt"
-	"github.com/google/uuid"
 	"github.com/mike-kimani/whitepointinventory/internal/users"
 	"time"
 )
@@ -82,7 +81,7 @@ func (s *paymentsService) CreatePayment(ctx context.Context, cashPaid, chickenPr
 	return payment, nil
 }
 
-func (s *paymentsService) GetPaymentByID(ctx context.Context, ID uuid.UUID) (*Payment, error) {
+func (s *paymentsService) GetPaymentByID(ctx context.Context, ID string) (*Payment, error) {
 	payment, err := s.repo.GetPaymentByID(ctx, ID)
 	if err != nil {
 		return nil, err
@@ -106,7 +105,7 @@ func (s *paymentsService) GetPagedPayments(ctx context.Context, offset, limit ui
 	return payments, nil
 }
 
-func (s *paymentsService) DeletePaymentByID(ctx context.Context, ID uuid.UUID) error {
+func (s *paymentsService) DeletePaymentByID(ctx context.Context, ID string) error {
 	err := s.repo.DeletePayment(ctx, ID)
 	if err != nil {
 		return err

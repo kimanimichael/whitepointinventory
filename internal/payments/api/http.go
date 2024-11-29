@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-chi/chi"
-	"github.com/google/uuid"
 	"github.com/mike-kimani/fechronizo/v2/pkg/httpresponses"
 	"github.com/mike-kimani/whitepointinventory/internal/http"
 	"github.com/mike-kimani/whitepointinventory/internal/payments"
@@ -109,16 +108,11 @@ func (h *PaymentsHandler) GetPagedPayments(w http.ResponseWriter, r *http.Reques
 }
 
 func (h *PaymentsHandler) DeletePayment(w http.ResponseWriter, r *http.Request, user *users.User) {
-	paymentIDStr := chi.URLParam(r, "payment_id")
-	paymentID, err := uuid.Parse(paymentIDStr)
-	if err != nil {
-		httpresponses.RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("Could not parse uuid: %s", paymentIDStr))
-		return
-	}
+	paymentID := chi.URLParam(r, "payment_id")
 
 	ctx := r.Context()
 
-	err = h.service.DeletePaymentByID(ctx, paymentID)
+	err := h.service.DeletePaymentByID(ctx, paymentID)
 	if err != nil {
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
