@@ -10,18 +10,14 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o whitepointinventory
+RUN go build -o build/whitepointinventory ./cmd
 
-FROM alpine:latest
+FROM scratch
 
 WORKDIR /root/
 
-COPY ../.env .
-
-COPY --from=build /src/go/github.com/mike-kimani/whitepointinventory/whitepointinventory .
+COPY --from=build /src/go/github.com/mike-kimani/whitepointinventory/build/whitepointinventory .
 
 EXPOSE 8080
 
 CMD ["./whitepointinventory"]
-
-
