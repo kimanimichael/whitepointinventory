@@ -32,7 +32,7 @@ func (h *FarmerHandler) RegisterRoutes(router chi.Router) {
 	router.Get("/farmers", h.GetFarmerByName)
 	router.Get("/farmer", h.GetFarmers)
 	router.Get("/paged_farmers", h.GetPagedFarmers)
-	router.Post("/set_farmer_balance", farmerAuth.MiddlewareAuth(h.SetFarmerBalances))
+	router.Post("/set_farmer_balances", farmerAuth.MiddlewareAuth(h.SetFarmerBalances))
 	router.Delete("/farmer", h.DeleteFarmerByID)
 }
 
@@ -115,6 +115,7 @@ func (h *FarmerHandler) SetFarmerBalances(w http.ResponseWriter, r *http.Request
 	decode := json.NewDecoder(r.Body)
 	if err := decode.Decode(&params); err != nil {
 		httpresponses.RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("Could not decode parameters :%v", err))
+		return
 	}
 	ctx := r.Context()
 	updatedFarmer, err := h.service.SetFarmerBalances(ctx, params.Name, params.ChickenBalance, params.CashBalance)
