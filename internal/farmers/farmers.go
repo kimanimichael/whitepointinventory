@@ -30,6 +30,7 @@ type FarmerService interface {
 	GetFarmerByName(ctx context.Context, name string) (*Farmer, error)
 	GetFarmers(ctx context.Context) ([]Farmer, error)
 	GetPagedFarmers(ctx context.Context, offset, limit uint32) (*FarmersPage, error)
+	SetFarmerBalances(ctx context.Context, name string, chickenBalance float64, cashBalance int32) (*Farmer, error)
 	DeleteFarmerByID(ctx context.Context, ID string) error
 }
 
@@ -38,5 +39,6 @@ type FarmerRepository interface {
 	GetFarmerByName(ctx context.Context, name string) (*Farmer, error)
 	GetFarmers(ctx context.Context) ([]Farmer, error)
 	GetPagedFarmers(ctx context.Context, offset, limit uint32) (*FarmersPage, error)
+	SetFarmerBalances(ctx context.Context, name string, chickenBalance float64, cashBalance int32) (*Farmer, error)
 	DeleteFarmerByID(ctx context.Context, ID string) error
 }

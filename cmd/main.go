@@ -76,7 +76,7 @@ func main() {
 	//Init http handlers
 	userHandler := usersapi.NewUserHandler(userService)
 	userHandler.RegisterRoutes(router)
-	farmerHandler := farmersapi.NewFarmerHandler(farmerService)
+	farmerHandler := farmersapi.NewFarmerHandler(farmerService, userService)
 	farmerHandler.RegisterRoutes(router)
 	purchasesHandler := purchasesapi.NewPurchasesHandler(purchasesService, userService)
 	purchasesHandler.RegisterRoutes(router)

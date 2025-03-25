@@ -61,6 +61,14 @@ func (s *farmerService) GetPagedFarmers(ctx context.Context, offset, limit uint3
 	return farmersPage, nil
 }
 
+func (s *farmerService) SetFarmerBalances(ctx context.Context, name string, chickenBalance float64, cashBalance int32) (*Farmer, error) {
+	farmer, err := s.repo.SetFarmerBalances(ctx, name, chickenBalance, cashBalance)
+	if err != nil {
+		return nil, err
+	}
+	return farmer, nil
+}
+
 func (s *farmerService) DeleteFarmerByID(ctx context.Context, ID string) error {
 	err := s.repo.DeleteFarmerByID(ctx, ID)
 	if err != nil {
