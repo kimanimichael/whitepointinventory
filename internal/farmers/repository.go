@@ -117,6 +117,36 @@ func (r *FarmerRepositorySQL) GetPagedFarmers(ctx context.Context, offset, limit
 	return page, nil
 }
 
+func (r *FarmerRepositorySQL) SetFarmerBalances(ctx context.Context, name string, chickenBalance float64, cashBalance int32) (*Farmer, error) {
+	var _chickenBalance sql.NullFloat64
+	_chickenBalance.Float64 = chickenBalance
+	_chickenBalance.Valid = true
+
+	var _cashBalance sql.NullInt32
+	_cashBalance.Int32 = cashBalance
+	_cashBalance.Valid = true
+
+	err := r.DB.SetFarmerBalances(ctx, sqlcdatabase.SetFarmerBalancesParams{
+		Name:           name,
+		ChickenBalance: _chickenBalance,
+		CashBalance:    _cashBalance,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("error setting farmer balances: %v", err)
+	}
+
+	farmer, err := r.DB.GetFarmerByName(ctx, name)
+	if err != nil {
+		return nil, fmt.Errorf("error getting farmer: %v", err)
+	}
+	return &Farmer{
+		ID:             farmer.ID.String(),
+		Name:           farmer.Name,
+		ChickenBalance: farmer.ChickenBalance.Float64,
+		CashBalance:    farmer.CashBalance.Int32,
+	}, nil
+}
+
 func (r *FarmerRepositorySQL) DeleteFarmerByID(ctx context.Context, ID string) error {
 	userID, err := uuid.Parse(ID)
 	if err != nil {

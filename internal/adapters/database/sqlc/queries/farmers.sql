@@ -38,6 +38,11 @@ SELECT * FROM farmers ORDER BY updated_at DESC;
 -- name: GetPagedFarmers :many
 SELECT * FROM farmers OFFSET $1 LIMIT $2;
 
+-- name: SetFarmerBalances :exec
+UPDATE farmers
+SET chicken_balance = $2, cash_balance = $3
+where farmers.name = $1;
+
 -- name: GetFarmerCount :one
 SELECT COUNT(*) AS total FROM farmers;
 

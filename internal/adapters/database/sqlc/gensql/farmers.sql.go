@@ -252,3 +252,20 @@ func (q *Queries) MarkFarmerAsUpdated(ctx context.Context, id uuid.UUID) error {
 	_, err := q.db.ExecContext(ctx, markFarmerAsUpdated, id)
 	return err
 }
+
+const setFarmerBalances = `-- name: SetFarmerBalances :exec
+UPDATE farmers
+SET chicken_balance = $2, cash_balance = $3
+where farmers.name = $1
+`
+
+type SetFarmerBalancesParams struct {
+	Name           string
+	ChickenBalance sql.NullFloat64
+	CashBalance    sql.NullInt32
+}
+
+func (q *Queries) SetFarmerBalances(ctx context.Context, arg SetFarmerBalancesParams) error {
+	_, err := q.db.ExecContext(ctx, setFarmerBalances, arg.Name, arg.ChickenBalance, arg.CashBalance)
+	return err
+}
