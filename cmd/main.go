@@ -23,6 +23,9 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// default mount path
+var mountPath = "/whitepoint"
+
 func main() {
 	fmt.Println("Welcome to WhitePointInventory V2!")
 
@@ -83,7 +86,7 @@ func main() {
 	httpapi.RegisterHealthHandlerRoutes(router)
 
 	actualRouter := chi.NewRouter()
-	actualRouter.Mount("/whitepoint", router)
+	actualRouter.Mount(mountPath, router)
 
 	srv := &http.Server{
 		Handler: actualRouter,
