@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/mike-kimani/whitepointinventory/internal/users"
+	"log"
 	"time"
 )
 
@@ -41,27 +42,28 @@ func (s *purchaseService) CreatePurchase(ctx context.Context, chickenNo, chicken
 	}
 	mostRecentPurchase, err := s.repo.GetMostRecentPurchase(ctx)
 	if err != nil {
-		return nil, err
-	}
-	currentTime := time.Now()
-	correctedMostRecentPurchaseTime := time.Date(
-		mostRecentPurchase.CreatedAt.Year(),
-		mostRecentPurchase.CreatedAt.Month(),
-		mostRecentPurchase.CreatedAt.Day(),
-		mostRecentPurchase.CreatedAt.Hour(),
-		mostRecentPurchase.CreatedAt.Minute(),
-		mostRecentPurchase.CreatedAt.Second(),
-		mostRecentPurchase.CreatedAt.Nanosecond(),
-		time.FixedZone("EAT", 3*60*60),
-	)
-	durationSinceLastPurchase := currentTime.Sub(correctedMostRecentPurchaseTime)
+		log.Println("Could not get most recent purchase:", err)
+	} else {
+		currentTime := time.Now()
+		correctedMostRecentPurchaseTime := time.Date(
+			mostRecentPurchase.CreatedAt.Year(),
+			mostRecentPurchase.CreatedAt.Month(),
+			mostRecentPurchase.CreatedAt.Day(),
+			mostRecentPurchase.CreatedAt.Hour(),
+			mostRecentPurchase.CreatedAt.Minute(),
+			mostRecentPurchase.CreatedAt.Second(),
+			mostRecentPurchase.CreatedAt.Nanosecond(),
+			time.FixedZone("EAT", 3*60*60),
+		)
+		durationSinceLastPurchase := currentTime.Sub(correctedMostRecentPurchaseTime)
 
-	if durationSinceLastPurchase < IdenticalTransactionInterval {
-		fmt.Printf("Duration Since Last Payment less than %d minutes\n", IdenticalTransactionInterval/time.Minute)
-		if mostRecentPurchase.FarmerName == farmerName {
-			if mostRecentPurchase.Chicken == chickenNo {
-				if mostRecentPurchase.PricePerChicken == chickenPrice {
-					return nil, fmt.Errorf("identical purchase made for Farmer %s. Wait for %d seconds", farmerName, int(IdenticalTransactionInterval.Seconds()-durationSinceLastPurchase.Seconds()))
+		if durationSinceLastPurchase < IdenticalTransactionInterval {
+			fmt.Printf("Duration Since Last Payment less than %d minutes\n", IdenticalTransactionInterval/time.Minute)
+			if mostRecentPurchase.FarmerName == farmerName {
+				if mostRecentPurchase.Chicken == chickenNo {
+					if mostRecentPurchase.PricePerChicken == chickenPrice {
+						return nil, fmt.Errorf("identical purchase made for Farmer %s. Wait for %d seconds", farmerName, int(IdenticalTransactionInterval.Seconds()-durationSinceLastPurchase.Seconds()))
+					}
 				}
 			}
 		}
