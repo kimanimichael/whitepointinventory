@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/mike-kimani/whitepointinventory/internal/adapters/database/sqlc/gensql"
 	"github.com/mike-kimani/whitepointinventory/internal/users"
+	"log"
 	"time"
 )
 
@@ -210,6 +211,22 @@ func (r *PaymentRepositorySql) GetPagedPayments(ctx context.Context, offset, lim
 		Payments: paymentResponse,
 	}
 	return paymentsPage, nil
+}
+
+func (r *PaymentRepositorySql) ChangePaymentDate(ctx context.Context, paymentID string, date time.Time, user *users.User) error {
+	paymentUID, err := uuid.Parse(paymentID)
+	if err != nil {
+		return fmt.Errorf("error parsing payment id: %v", err)
+	}
+	err = r.DB.ChangePaymentDate(ctx, sqlcdatabase.ChangePaymentDateParams{
+		ID:        paymentUID,
+		UpdatedAt: date,
+	})
+	if err != nil {
+		return fmt.Errorf("error updating payment: %v", err)
+	}
+	log.Printf("payment updated by %s", user.Name)
+	return nil
 }
 
 func (r *PaymentRepositorySql) DeletePayment(ctx context.Context, ID string) error {

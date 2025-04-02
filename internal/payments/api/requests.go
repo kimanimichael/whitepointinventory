@@ -1,5 +1,7 @@
 package paymentsapi
 
+import "time"
+
 type CreatePaymentRequest struct {
 	CashPaid     int32  `json:"cash_paid"`
 	ChickenPrice int32  `json:"price_per_chicken_paid"`
@@ -13,4 +15,9 @@ type GetTransactionRequest struct {
 type GetPagedPaymentsRequest struct {
 	Offset uint32 `json:"offset"`
 	Limit  uint32 `json:"limit"`
+}
+
+type ChangePaymentDateRequest struct {
+	ID   string    `json:"payment_id"`
+	Time time.Time `json:"new_time"`
 }

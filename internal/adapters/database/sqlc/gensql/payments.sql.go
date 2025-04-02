@@ -12,6 +12,22 @@ import (
 	"github.com/google/uuid"
 )
 
+const changePaymentDate = `-- name: ChangePaymentDate :exec
+UPDATE payments
+SET updated_at = $2, created_at = $2
+where payments.id = $1
+`
+
+type ChangePaymentDateParams struct {
+	ID        uuid.UUID
+	UpdatedAt time.Time
+}
+
+func (q *Queries) ChangePaymentDate(ctx context.Context, arg ChangePaymentDateParams) error {
+	_, err := q.db.ExecContext(ctx, changePaymentDate, arg.ID, arg.UpdatedAt)
+	return err
+}
+
 const createPayment = `-- name: CreatePayment :one
 INSERT INTO payments (id, created_at, updated_at, cash_paid, price_per_chicken_paid, user_id, farmer_id)
 VALUES($1, $2, $3, $4, $5, $6, $7)

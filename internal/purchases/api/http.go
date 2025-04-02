@@ -31,6 +31,7 @@ func (h *PurchasesHandler) RegisterRoutes(router chi.Router) {
 	router.Get("/purchase", h.GetPurchaseByID)
 	router.Get("/purchases", h.GetPurchases)
 	router.Get("/paged_purchases", h.GetPagedPurchases)
+	router.Post("/change_purchase_date", purchasesAuth.MiddlewareAuth(h.ChangePurchaseDate))
 	router.Delete("/purchases/{purchase_id}", purchasesAuth.MiddlewareAuth(h.DeletePurchase))
 }
 
@@ -107,6 +108,23 @@ func (h *PurchasesHandler) GetPagedPurchases(w http.ResponseWriter, r *http.Requ
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, err.Error())
 	}
 	httpresponses.RespondWithJson(w, http.StatusOK, pagedPurchases)
+}
+
+func (h *PurchasesHandler) ChangePurchaseDate(w http.ResponseWriter, r *http.Request, user *users.User) {
+	params := ChangePurchaseDateRequest{}
+
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&params); err != nil {
+		httpresponses.RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("failed to decode request body"))
+		return
+	}
+	ctx := r.Context()
+	err := h.service.ChangePurchaseDate(ctx, params.ID, params.Time, user)
+	if err != nil {
+		httpresponses.RespondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	httpresponses.RespondWithJson(w, http.StatusOK, fmt.Sprintf("Purchase date changed by %v", user.Name))
 }
 
 func (h *PurchasesHandler) DeletePurchase(w http.ResponseWriter, r *http.Request, user *users.User) {
