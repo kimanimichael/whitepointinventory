@@ -98,6 +98,14 @@ func (s *purchaseService) GetPagedPurchases(ctx context.Context, offset, limit u
 	return purchasePage, nil
 }
 
+func (s *purchaseService) ChangePurchaseDate(ctx context.Context, paymentID string, date time.Time, user *users.User) error {
+	err := s.repo.ChangePurchaseDate(ctx, paymentID, date, user)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *purchaseService) DeletePurchaseByID(ctx context.Context, ID string) error {
 	err := s.repo.DeletePurchase(ctx, ID)
 	if err != nil {

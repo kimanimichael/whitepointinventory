@@ -31,6 +31,7 @@ func (h *PaymentsHandler) RegisterRoutes(router chi.Router) {
 	router.Get("/payment", h.GetPaymentByID)
 	router.Get("/payments", h.GetPayments)
 	router.Get("/paged_payments", h.GetPagedPayments)
+	router.Post("/change_payment_date", paymentAuth.MiddlewareAuth(h.ChangePaymentDate))
 	router.Delete("/payments/{payment_id}", paymentAuth.MiddlewareAuth(h.DeletePayment))
 }
 
@@ -105,6 +106,23 @@ func (h *PaymentsHandler) GetPagedPayments(w http.ResponseWriter, r *http.Reques
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, err.Error())
 	}
 	httpresponses.RespondWithJson(w, http.StatusOK, paymentsPage)
+}
+
+func (h *PaymentsHandler) ChangePaymentDate(w http.ResponseWriter, r *http.Request, user *users.User) {
+	params := ChangePaymentDateRequest{}
+
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&params); err != nil {
+		httpresponses.RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("failed to decode request body"))
+		return
+	}
+	ctx := r.Context()
+	err := h.service.ChangePaymentDate(ctx, params.ID, params.Time, user)
+	if err != nil {
+		httpresponses.RespondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	httpresponses.RespondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
 func (h *PaymentsHandler) DeletePayment(w http.ResponseWriter, r *http.Request, user *users.User) {

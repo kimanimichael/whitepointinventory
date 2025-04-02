@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	sqlcdatabase "github.com/mike-kimani/whitepointinventory/internal/adapters/database/sqlc/gensql"
 	"github.com/mike-kimani/whitepointinventory/internal/users"
+	"log"
 	"time"
 )
 
@@ -218,6 +219,22 @@ func (r *PurchaseRepositorySQL) GetPagedPurchases(ctx context.Context, offset, l
 		Purchases: purchasesToReturn,
 	}
 	return returnedPage, nil
+}
+
+func (r *PurchaseRepositorySQL) ChangePurchaseDate(ctx context.Context, purchaseID string, date time.Time, user *users.User) error {
+	purchaseUID, err := uuid.Parse(purchaseID)
+	if err != nil {
+		return fmt.Errorf("error parsing purchase id: %v", err)
+	}
+	err = r.DB.ChangePurchaseDate(ctx, sqlcdatabase.ChangePurchaseDateParams{
+		ID:        purchaseUID,
+		UpdatedAt: date,
+	})
+	if err != nil {
+		return fmt.Errorf("error updating purchase: %v", err)
+	}
+	log.Printf("purchase updated by %s", user.Name)
+	return nil
 }
 
 func (r *PurchaseRepositorySQL) DeletePurchase(ctx context.Context, ID string) error {

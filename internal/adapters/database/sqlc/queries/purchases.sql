@@ -29,3 +29,8 @@ SELECT * FROM purchases
 ORDER BY created_at DESC
     LIMIT 1;
 
+-- name: ChangePurchaseDate :exec
+UPDATE purchases
+SET updated_at = $2, created_at = $2
+where purchases.id = $1;
+

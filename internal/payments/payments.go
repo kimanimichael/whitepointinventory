@@ -35,6 +35,7 @@ type PaymentsService interface {
 	GetPaymentByID(ctx context.Context, ID string) (*Payment, error)
 	GetPayments(ctx context.Context) ([]Payment, error)
 	GetPagedPayments(ctx context.Context, offset, limit uint32) (*PaymentPage, error)
+	ChangePaymentDate(ctx context.Context, paymentID string, date time.Time, user *users.User) error
 	DeletePaymentByID(ctx context.Context, ID string) error
 }
 
@@ -44,5 +45,6 @@ type PaymentsRepository interface {
 	GetMostRecentPayment(ctx context.Context) (*Payment, error)
 	GetPayments(ctx context.Context) ([]Payment, error)
 	GetPagedPayments(ctx context.Context, offset, limit uint32) (*PaymentPage, error)
+	ChangePaymentDate(ctx context.Context, paymentID string, date time.Time, user *users.User) error
 	DeletePayment(ctx context.Context, ID string) error
 }

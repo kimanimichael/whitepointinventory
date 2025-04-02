@@ -36,6 +36,7 @@ type PurchaseRepository interface {
 	GetMostRecentPurchase(ctx context.Context) (*Purchase, error)
 	GetPurchases(ctx context.Context) ([]Purchase, error)
 	GetPagedPurchases(ctx context.Context, offset, limit uint32) (*PurchasePage, error)
+	ChangePurchaseDate(ctx context.Context, purchaseID string, date time.Time, user *users.User) error
 	DeletePurchase(ctx context.Context, ID string) error
 }
 
@@ -44,5 +45,6 @@ type PurchaseService interface {
 	GetPurchaseByID(ctx context.Context, ID string) (*Purchase, error)
 	GetPurchases(ctx context.Context) ([]Purchase, error)
 	GetPagedPurchases(ctx context.Context, offset, limit uint32) (*PurchasePage, error)
+	ChangePurchaseDate(ctx context.Context, purchaseID string, date time.Time, user *users.User) error
 	DeletePurchaseByID(ctx context.Context, ID string) error
 }

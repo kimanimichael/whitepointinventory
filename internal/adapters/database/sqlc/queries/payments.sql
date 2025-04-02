@@ -24,3 +24,8 @@ DELETE FROM payments WHERE id = $1;
 SELECT * FROM payments
 ORDER BY created_at DESC
     LIMIT 1;
+
+-- name: ChangePaymentDate :exec
+UPDATE payments
+SET updated_at = $2, created_at = $2
+where payments.id = $1;
