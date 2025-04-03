@@ -59,7 +59,7 @@ func (s *paymentsService) CreatePayment(ctx context.Context, cashPaid, chickenPr
 			mostRecentPayment.CreatedAt.Minute(),
 			mostRecentPayment.CreatedAt.Second(),
 			mostRecentPayment.CreatedAt.Nanosecond(),
-			time.FixedZone("EAT", 3*60*60),
+			time.Local,
 		)
 		durationSinceLastPayment := currentTime.Sub(correctedMostRecentPaymentTime)
 

@@ -53,7 +53,7 @@ func (s *purchaseService) CreatePurchase(ctx context.Context, chickenNo, chicken
 			mostRecentPurchase.CreatedAt.Minute(),
 			mostRecentPurchase.CreatedAt.Second(),
 			mostRecentPurchase.CreatedAt.Nanosecond(),
-			time.FixedZone("EAT", 3*60*60),
+			time.Local,
 		)
 		durationSinceLastPurchase := currentTime.Sub(correctedMostRecentPurchaseTime)
 
