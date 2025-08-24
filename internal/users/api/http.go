@@ -3,8 +3,8 @@ package usersapi
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/go-chi/chi"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/mike-kimani/fechronizo/v2/pkg/httpresponses"
 	"github.com/mike-kimani/whitepointinventory/internal/users"
 	httpauth "github.com/mike-kimani/whitepointinventory/pkg/http"
@@ -91,9 +91,9 @@ func (h *UserHandler) UserLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
+	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
 		Issuer:    user.ID,
-		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 	})
 	token, err := claims.SignedString([]byte(secretKey))
 	if err != nil {
@@ -118,14 +118,14 @@ func (h *UserHandler) GetUserFromCookie(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	tokenString := cookie.Value
-	token, err := jwt.ParseWithClaims(tokenString, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(secretKey), nil
 	})
 	if err != nil {
 		httpresponses.RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Error getting token: %v", err))
 		return
 	}
-	claims := token.Claims.(*jwt.StandardClaims)
+	claims := token.Claims.(*jwt.RegisteredClaims)
 	userID := claims.Issuer
 
 	ctx := r.Context()
