@@ -1,6 +1,8 @@
 module github.com/mike-kimani/whitepointinventory
 
-go 1.21.0
+go 1.23.0
+
+toolchain go1.24.6
 
 require (
 	github.com/go-chi/chi v1.5.5
@@ -15,7 +17,7 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/mike-kimani/fechronizo/v2 v2.0.1
 	github.com/nelkinda/health-go v0.0.1
-	golang.org/x/crypto v0.24.0
+	golang.org/x/crypto v0.41.0
 )
 
 require github.com/nelkinda/http-go v0.0.1 // indirect
